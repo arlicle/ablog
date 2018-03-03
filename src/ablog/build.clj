@@ -1,4 +1,5 @@
-(ns ablog.build)
+(ns ablog.build
+  (:require [markdown.core :as md]))
 
 
 (def posts-list (file-seq (clojure.java.io/file "posts")))
@@ -22,10 +23,14 @@
   (doseq [f (only-md-files posts-list)]
     (try (let [rdr (clojure.java.io/reader f)
         post-config (read (java.io.PushbackReader. rdr))
-        post-content (line-seq (java.io.BufferedReader. rdr))]
+        post-content (line-seq (java.io.BufferedReader. rdr))
+        f-html-path (str "public/" (clojure.string/replace (.getName f) #"^(\d+)-(.*?)\.md$" "$2.html"))
+        f-post-path (clojure.string/replace (.toString f), #"\.md", ".html")]
         (println post-config)
-        (println post-content))
-    (catch Exception e (println "出错啦，啦啦")))
+        (println f-html-path)
+        (spit f-html-path (md/md-to-html-string (clojure.string/join "\n" post-content)))
+        )
+    (catch Exception e (println e)))
     (println f)))
 
 
