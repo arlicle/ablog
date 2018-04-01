@@ -17,6 +17,7 @@
 (deftask parse
   "just a test"
   []
+  (println posts-list)
   (parse-file))
 
 
@@ -26,5 +27,12 @@
   (comp
    (serve :dir "public")
    (watch)
-   (cljs)
-   (target :dir #{"public"})))
+   ;(hello)
+   ;(cljs)
+   ;(target :dir #{"public"})
+   ))
+
+
+(deftask to-html []
+  (parse-file)
+  )

@@ -1,12 +1,25 @@
 (ns ablog.build
   (:require [markdown.core :as md]
+    [boot.core :as core]
     [clj-time.format :as clj-time-format]
     [selmer.parser :refer [render render-file]]))
 
 (selmer.parser/set-resource-path! (System/getProperty "user.dir"))
 
-
+; 获取所有的post文件列表
 (def posts-list (file-seq (clojure.java.io/file "posts")))
+
+; 获取皮肤
+(defn get-theme 
+  "获取当前的皮肤"
+  []
+  "default")
+
+; 默认网站参数
+(def default-config {
+  :site-title "a git blog"
+})
+; 获取对应皮肤下的模板路径
 
 (defn only-md-files
   [file-s]
@@ -21,6 +34,8 @@
   )
 )
 
+; (deftask hello []
+;   (println "Hello world!******!"))
 ; 用模板渲染内容
 
 (defn parse-file
@@ -30,15 +45,17 @@
     (try (let [rdr (clojure.java.io/reader f)
         post-config (read (java.io.PushbackReader. rdr))
         post-content (line-seq (java.io.BufferedReader. rdr))
-        [_ post-time post-filename] (re-find #"^(\d+)-(.*?)\.md$" (.getName f))
+        [_ post-time-int post-filename] (re-find #"^(\d+)-(.*?)\.md$" (.getName f))
         post-filepath (str "public/" post-filename ".html")
         ;f-html-path (str "public/" (clojure.string/replace (.getName f) #"^(\d+)-(.*?)\.md$" "$2.html"))
-        post-html (render-file "theme/post.html" {:post-title (:title post-config) :post-content (md/md-to-html-string (clojure.string/join "\n" post-content))})
+        post-html (render-file "theme/post.html" {:post-title (:title post-config) 
+            :post-content (md/md-to-html-string (clojure.string/join "\n" post-content))
+            :post-time (clj-time-format/parse (clj-time-format/formatter "yyyyMMdd") "20101211")})
         ]
 
         (println post-config)
         (println post-filepath)
-        (println post-time)
+        ; (println post-time)
         (println post-filename)
         (println _)
         (println (clj-time-format/parse (clj-time-format/formatter "yyyyMMdd") "20101211"))
