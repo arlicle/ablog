@@ -1,26 +1,47 @@
 (ns ablog.build
   (:require [markdown.core :as md]
     [boot.core :as core]
+    [clojure.java.io :as io]
     [clj-time.format :as clj-time-format]
     [selmer.parser :refer [render render-file]]))
 
 (selmer.parser/set-resource-path! (System/getProperty "user.dir"))
 
-; 获取所有的post文件列表
-(def posts-list (file-seq (clojure.java.io/file "posts")))
+
+
+; 默认网站参数
+(def default-settings {
+  :site-title "a git blog"
+  :posts-dir "posts"
+  :page-dir "pages"
+  :public-dir "public"
+})
+
+; 获取网站参数
+(defn get-settings
+  "获取网站的各项设置"
+  []
+  (merge default-settings (read-string (slurp "settings.ini"))))
+
+
+(defn get-posts-list
+  "获取所有的post文件列表"
+  [settings]
+  (file-seq (clojure.java.io/file (:posts-dir settings))))
 
 ; 获取皮肤
 (defn get-theme 
   "获取当前的皮肤"
-  []
-  "default")
+  [settings]
+  (:theme settings "default"))
 
-; 默认网站参数
-(def default-config {
-  :site-title "a git blog"
-})
 ; 获取对应皮肤下的模板路径
+(defn get-theme-file-path
+  "获取皮肤文件地址"
+  [settings template-filename]
+  (str "theme/" (get-theme settings) "/" template-filename))
 
+  
 (defn only-md-files
   [file-s]
   ;(println file-s)
