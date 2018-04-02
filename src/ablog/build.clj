@@ -17,6 +17,8 @@
   :public-dir "public"
   :valid-filename-ext #{"md" "html" "gdb"}
   :theme "default"
+  :post-date-format "yyyyMMdd HH:mm"
+  :post-filename-date-format "yyyyMMddHHmm"
 })
 
 ; 获取网站参数
@@ -63,6 +65,23 @@
   [settings org-filename]
   (str (:public-dir settings) "/" org-filename))
 
+(defn time-formater
+  [format-str time-str]
+  (-> (subs time-str 0 (count time-str))
+      (clj-time-format/formatter)
+      (#(clj-time-format/parse % time-str))))
+
+(defn get-post-time
+  "获取 post 提交时间"
+  [settings post-config file]
+  (if-let [write-date (:date post-config)]
+    (time-formater (:post-date-format settings) write-date)
+    (->> (re-find #"^(\d+)-(.*?)\.md$" (.getName file))
+        (second)
+        (time-formater (:post-filename-date-format settings))
+    )
+    ))
+
 (defn only-md-files
   [file-s]
   ;(println file-s)
@@ -77,7 +96,6 @@
 )
 
 
-
 (defn get-file-interpretor
   "获取文件解释器，如果是不合法的文件，返回nil"
   [file]
@@ -90,14 +108,17 @@
   [settings file]
   (if (is-valid-file settings file)
     (let [rdr (clojure.java.io/reader file)
+          file-str (str file)
           post-config (read (java.io.PushbackReader. rdr))
           post-content (line-seq (java.io.BufferedReader. rdr))
+          post-time (get-post-time settings post-config file)
           [_ post-time-int post-filename] (re-find #"^(\d+)-(.*?)\.md$" (.getName file))
           post-filepath (str "public/" post-filename ".html")
           post-html (render-file (str "theme/" (:theme settings) "/post.html") {:post-title (:title post-config) 
             :post-content (md/md-to-html-string (clojure.string/join "\n" post-content))
             :post-time (clj-time-format/parse (clj-time-format/formatter "yyyyMMdd") "20101211")})]
       (println post-html)
+      (println post-time)
       (spit post-filepath post-html))
   )
 )
