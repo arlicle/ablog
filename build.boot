@@ -17,8 +17,8 @@
 (deftask parse
   "just a test"
   []
-  (println posts-list)
-  (parse-file))
+  (generate)
+  )
 
 
 (deftask dev
