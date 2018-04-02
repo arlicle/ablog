@@ -100,7 +100,6 @@
       (println post-html)
       (spit post-filepath post-html))
   )
-  ;(if (is-valid-file) file)
 )
 
 (defn generate
