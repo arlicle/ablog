@@ -3,6 +3,7 @@
     [boot.core :as core]
     [clojure.java.io :as io]
     [clj-time.format :as clj-time-format]
+    [clj-time.core :as clj-time-core]
     [selmer.parser :refer [render render-file]]))
 
 (selmer.parser/set-resource-path! (System/getProperty "user.dir"))
@@ -17,8 +18,9 @@
   :public-dir "public"
   :valid-filename-ext #{"md" "html" "gdb"}
   :theme "default"
-  :post-date-format "yyyyMMdd HH:mm"
+  :post-date-format "yyyy-MM-dd HH:mm"
   :post-filename-date-format "yyyyMMddHHmm"
+  :post-permalink ":year/:month/:day/:title/"
 })
 
 ; 获取网站参数
@@ -62,12 +64,18 @@
 
 (defn get-public-post-filepath
   "获取源文件文件对应的public文件"
-  [settings org-filename]
-  (str (:public-dir settings) "/" org-filename))
+  [settings file post-time]
+  (str (:public-dir settings)
+       "/" 
+       (reduce (fn [s [key val]] (clojure.string/replace s (re-pattern (str key)) (str val))) 
+        (:post-permalink settings) {:year (str (clj-time-core/year post-time)) :month (str (clj-time-core/month post-time)) :day (str (clj-time-core/day post-time)) :title (.getName file)})
+       ))
+
+
 
 (defn time-formater
   [format-str time-str]
-  (-> (subs time-str 0 (count time-str))
+  (-> (subs format-str 0 (count time-str))
       (clj-time-format/formatter)
       (#(clj-time-format/parse % time-str))))
 
@@ -81,6 +89,7 @@
         (time-formater (:post-filename-date-format settings))
     )
     ))
+
 
 (defn only-md-files
   [file-s]
@@ -112,13 +121,15 @@
           post-config (read (java.io.PushbackReader. rdr))
           post-content (line-seq (java.io.BufferedReader. rdr))
           post-time (get-post-time settings post-config file)
-          [_ post-time-int post-filename] (re-find #"^(\d+)-(.*?)\.md$" (.getName file))
-          post-filepath (str "public/" post-filename ".html")
+          post-filepath (get-public-post-filepath settings file post-time)
+          ;[_ post-time-int post-filename] (re-find #"^(\d+)-(.*?)\.md$" (.getName file))
+          ;post-filepath (str "public/" post-filename ".html")
           post-html (render-file (str "theme/" (:theme settings) "/post.html") {:post-title (:title post-config) 
             :post-content (md/md-to-html-string (clojure.string/join "\n" post-content))
-            :post-time (clj-time-format/parse (clj-time-format/formatter "yyyyMMdd") "20101211")})]
+            :post-time post-time})]
       (println post-html)
       (println post-time)
+      (println post-filepath)
       (spit post-filepath post-html))
   )
 )
