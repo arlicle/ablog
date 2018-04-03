@@ -13,6 +13,7 @@
 (require '[adzerk.boot-cljs :refer [cljs]]
          '[pandeiro.boot-http :refer [serve]]
          '[ablog.build :refer :all]
+         '[adzerk.boot-test :refer :all]
          )
 
 (deftask parse
