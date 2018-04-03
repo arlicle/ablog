@@ -99,7 +99,7 @@
       )
 ))
 
-(defn get-
+(defn get-posts-list
   "获取所有的post文件列表，返回的是：
   文章内容
   文章标题
@@ -135,8 +135,8 @@
   "整站生成静态网站"
   []
   (let [settings (get-settings)
-         (partition 3 1 (lazy-cat [nil] (get- settings) [nil]))
+        posts-list (partition 3 1 (lazy-cat [nil] (get-posts-list settings) [nil]))
     ]
-      (pmap #(generate-post settings %) )
+      (pmap #(generate-post settings %) posts-list)
     ))
 
