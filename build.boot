@@ -7,7 +7,8 @@
                  [adzerk/boot-reload "0.5.2"]
                  [markdown-clj "1.0.1"]
                  [clj-time "0.14.2"]
-                 [selmer "1.11.7"]])
+                 [selmer "1.11.7"]
+                 [adzerk/boot-test "1.2.0"]])
 
 (require '[adzerk.boot-cljs :refer [cljs]]
          '[pandeiro.boot-http :refer [serve]]
