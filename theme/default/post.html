@@ -1,14 +1,15 @@
 <!doctype html>
 <html>
   <head>
-    <title>{{post-title}} - {{site-title}}</title>
+    <title>{{title}} - {{site-title}}</title>
   </head>
   <body>
-    <h1>{{post-title}}</h1>
+    <h1>{{title}}</h1>
     <div class="content">
-        {{ post-content|safe }}
-        <p>{{ post-time|date:"yyy-MM-dd HH:mm" }}</p>
+        {{ content|safe }}
+        <p>{{ date|date:"yyy-MM-dd HH:mm" }}</p>
+        {{ prev-post }}
+        {{ next-post }}
     </div>
-    <script src="main.js"></script>
   </body>
 </html>
