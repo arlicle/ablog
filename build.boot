@@ -33,6 +33,3 @@
    ))
 
 
-(deftask to-html []
-  (parse-file)
-  )
