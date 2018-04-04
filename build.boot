@@ -1,6 +1,6 @@
 (set-env!
  :source-paths #{"src"}
- :resource-paths #{"theme"}
+ :resource-paths #{"theme" "test"}
  :dependencies '[[adzerk/boot-cljs "2.1.4"]
                  [pandeiro/boot-http "0.8.3"]
                  [org.clojure/tools.nrepl "0.2.12"]
@@ -8,13 +8,15 @@
                  [markdown-clj "1.0.1"]
                  [clj-time "0.14.2"]
                  [selmer "1.11.7"]
-                 [adzerk/boot-test "1.2.0"]
-                 [seancorfield/boot-expectations "1.0.11"]])
+                 ;[adzerk/boot-test "1.2.0"]
+                 ;[seancorfield/boot-expectations "1.0.11"]
+                 [metosin/bat-test "0.4.0" :scope "test"]])
 
 (require '[adzerk.boot-cljs :refer [cljs]]
          '[pandeiro.boot-http :refer [serve]]
          '[ablog.build :refer :all]
-         '[adzerk.boot-test :refer :all]
+         ;'[adzerk.boot-test :refer :all]
+         '[metosin.bat-test :refer (bat-test)]
          )
 
 (deftask parse

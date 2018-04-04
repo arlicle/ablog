@@ -1,6 +1,5 @@
 (ns ablog.build
   (:require [markdown.core :as md]
-    [boot.core :as core]
     [clojure.java.io :as io]
     [clj-time.format :as clj-time-format]
     [clj-time.core :as clj-time-core]
