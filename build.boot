@@ -8,7 +8,8 @@
                  [markdown-clj "1.0.1"]
                  [clj-time "0.14.2"]
                  [selmer "1.11.7"]
-                 [adzerk/boot-test "1.2.0"]])
+                 [adzerk/boot-test "1.2.0"]
+                 [seancorfield/boot-expectations "1.0.11"]])
 
 (require '[adzerk.boot-cljs :refer [cljs]]
          '[pandeiro.boot-http :refer [serve]]
