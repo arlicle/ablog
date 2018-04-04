@@ -42,20 +42,23 @@
   [settings file]
   (get (:valid-filename-ext settings) (get-file-ext (str file))))
 
+; 时间输入格式
+(def multi-parser (clj-time-format/formatter (clj-time-core/default-time-zone) "yyyy-MM-dd" "yyyy/MM/dd" "dd/MM/yyyy" "yyyy-MM-dd HH:mm" "yyyy/MM/dd HH:mm" "dd/MM/yyyy HH:mm" "yyyyMMddHHmm" "yyyyMMdd" "yyyyMMddHH"))
+
+
 (defn time-formater
-  [format-str time-str]
-  (-> (subs format-str 0 (count time-str))
-      (clj-time-format/formatter)
-      (#(clj-time-format/parse % time-str))))
+  [time-str]
+  (clj-time-format/parse multi-parser time-str))
+
 
 (defn get-post-date
   "获取 post 提交时间"
   [settings post-config file]
   (if-let [write-date (:date post-config)]
-    (time-formater (:post-date-format settings) write-date)
+    (time-formater write-date)
     (->> (re-find #"^(\d+)-(.*?)\.md$" (.getName file))
         (second)
-        (time-formater (:post-filename-date-format settings))
+        (time-formater)
     )))
 
 (defn get-post-url
