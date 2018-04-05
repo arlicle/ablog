@@ -38,12 +38,12 @@
     (subs filename)))
 
 (defn is-valid-file
-  "是否是有效的模板文件"
+  "是否是有效的模板文件，返回模板后缀名"
   [settings file]
   (get (:valid-filename-ext settings) (get-file-ext (str file))))
 
 ; 时间输入格式
-(def multi-parser (clj-time-format/formatter (clj-time-core/default-time-zone) "yyyy-MM-dd" "yyyy/MM/dd" "dd/MM/yyyy" "yyyy-MM-dd HH:mm" "yyyy/MM/dd HH:mm" "dd/MM/yyyy HH:mm" "yyyyMMddHHmm" "yyyyMMdd" "yyyyMMddHH"))
+(def multi-parser (clj-time-format/formatter (clj-time-core/default-time-zone) "yyyy-MM-dd" "yyyy/MM/dd" "dd/MM/yyyy" "yyyy-MM-dd HH:mm" "yyyy/MM/dd HH:mm" "dd/MM/yyyy HH:mm" "yyyyMMdd HH:mm" "yyyyMMddHHmm" "yyyyMMdd" "yyyyMMddHH"))
 
 
 (defn time-formater
@@ -137,8 +137,9 @@
   "整站生成静态网站"
   []
   (let [settings (get-settings)
-        posts-list (partition 3 1 (lazy-cat [nil] (get-posts-list settings) [nil]))
+        post-list (get-posts-list settings)
+        post-part-list (partition 3 1 (lazy-cat [nil] post-list [nil]))
     ]
-      (pmap #(generate-post settings %) posts-list)
+      (pmap #(generate-post settings %) post-part-list)
     ))
 
