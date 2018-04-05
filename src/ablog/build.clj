@@ -78,7 +78,7 @@
         (:post-permalink settings) {:year (str (clj-time-core/year post-time)) 
           :month (str (clj-time-core/month post-time)) 
           :day (str (clj-time-core/day post-time)) 
-          :title (.getName file)})]
+          :title (clojure.string/replace (.getName file) #"^\d+-" "")})]
           (subs f 0 (clojure.string/last-index-of f "."))
        )
        ".html"))
@@ -136,7 +136,7 @@
   "生成首页"
   [settings [prev-post post next-post]]
   (println (assoc post :filepath "index.html"))
-  (generate-html settings [prev-post (assoc post :filepath (str (:public-dir settings) "/index.html")) next-post] "index.html"))
+  (generate-html settings [prev-post (assoc post :filepath (str (:public-dir settings) "/index.html")) next-post] "post.html"))
 
 (defn generate
   "整站生成静态网站"
