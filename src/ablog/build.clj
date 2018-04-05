@@ -125,7 +125,6 @@
   [settings [prev-post post next-post] template_filename]
   (let [new-post (assoc post :prev-post prev-post :next-post next-post) 
     post-html (render-file (str "theme/" (:theme settings) "/" template_filename) new-post)]
-    (println template_filename)
     ; (println post-html)
     (println (:filepath post))
     (clojure.java.io/make-parents (:filepath post))
@@ -135,7 +134,6 @@
 (defn generate-homepage
   "生成首页"
   [settings [prev-post post next-post]]
-  (println (assoc post :filepath "index.html"))
   (generate-html settings [prev-post (assoc post :filepath (str (:public-dir settings) "/index.html")) next-post] "post.html"))
 
 (defn generate
@@ -146,6 +144,8 @@
         newest-post-part (last post-part-list)
     ]
       (generate-homepage settings newest-post-part)
-      (pmap #(generate-html settings % "post.html") post-part-list)
+      (doall
+        (pmap #(generate-html settings % "post.html") post-part-list)
+      )
     ))
 
