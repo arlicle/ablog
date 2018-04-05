@@ -22,11 +22,14 @@
   :post-permalink ":year/:month/:day/:title/"
 })
 
+
+
 ; 获取网站参数
 (defn get-settings
   "获取网站的各项设置"
   []
   (merge default-settings (read-string (slurp "settings.ini"))))
+
 
 
 (defn get-file-ext 
@@ -37,13 +40,18 @@
     (#(inc %))
     (subs filename)))
 
+
+
 (defn is-valid-file
   "是否是有效的模板文件，返回模板后缀名"
   [settings file]
   (get (:valid-filename-ext settings) (get-file-ext (str file))))
 
+
+
 ; 时间输入格式
 (def multi-parser (clj-time-format/formatter (clj-time-core/default-time-zone) "yyyy-MM-dd" "yyyy/MM/dd" "dd/MM/yyyy" "yyyy-MM-dd HH:mm" "yyyy/MM/dd HH:mm" "dd/MM/yyyy HH:mm" "yyyyMMdd HH:mm" "yyyyMMddHHmm" "yyyyMMdd" "yyyyMMddHH"))
+
 
 
 (defn time-formater
@@ -61,11 +69,13 @@
         (time-formater)
     )))
 
+
+
+
 (defn get-post-url
   "获取 post 的对外访问的 url"
   [settings post-filepath]
   (subs post-filepath (count (:public-dir settings))))
-
 
 
 
@@ -101,6 +111,8 @@
       )
 ))
 
+
+
 (defn get-posts-list
   "获取所有的post文件列表，返回的是：
   文章内容
@@ -108,15 +120,11 @@
   文章时间
   其它变量的一个map组成的列表"
   [settings]
-  ; (doall
   (->> (file-seq (clojure.java.io/file (:posts-dir settings)))
         (pmap #(parse-post settings %))
         (filter not-empty)
         (sort-by :date)
   ))
-  ; )
-
-
 
 
 
@@ -131,19 +139,22 @@
     (spit (:filepath post) post-html))
 )
 
+
+
 (defn generate-homepage
   "生成首页"
   [settings [prev-post post next-post]]
   (generate-html settings [prev-post (assoc post :filepath (str (:public-dir settings) "/index.html")) next-post] "post.html"))
+
+
 
 (defn generate
   "整站生成静态网站"
   []
   (let [settings (get-settings)
         post-part-list (partition 3 1 (lazy-cat [nil] (get-posts-list settings) [nil]))
-        newest-post-part (last post-part-list)
     ]
-      (generate-homepage settings newest-post-part)
+      (generate-homepage settings (last post-part-list))
       (doall
         (pmap #(generate-html settings % "post.html") post-part-list)
       )

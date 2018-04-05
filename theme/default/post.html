@@ -1,22 +1,59 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
   <head>
+    <meta charset="utf-8" />
     <title>{{title}} - {{site-title}}</title>
+    <meta name="renderer" content="webkit">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+    <link rel="stylesheet" href="/css/style.css">
   </head>
-  <body>
-    <h1>{{title}}</h1>
-    <h2><a href="/">首页</a></h2>
-    <div class="content">
-        {{ content|safe }}
-        <p>{{ date|date:"yyy-MM-dd HH:mm" }}</p>
-        {% if prev-post %}
-        <h3><a href="{{ prev-post.url }}">上一篇: {{ prev-post.title }}</a></h3>
-        {% endif %}
-        {% if next-post %}
-        <h3><a href="{{ next-post.url }}">下一篇: {{ next-post.title }}</a></h3>
-        {% endif %}
-        {{ prev-post }}
-        {{ next-post }}
-    </div>
-  </body>
+  <body class="body-post">
+  <div class="post-wrapper">
+    <h1 class="post-title"><a href="#">{{title}}</a></h1>
+    <p class="post-date">{{ date|date:"yyy-MM-dd" }}</p>
+    {{ content|safe }}
+  </div>
+
+  {#
+  <div class="about-wrapper">
+  <div class="aboutme">
+    <h2><a href="/">相关文章</a></h2>
+    <ul>
+      <li>
+        <a href="/carriage-return-line-feed-new-line-end-file" class="title">回车、换行、和文件末尾空行</a>
+      </li>
+      <li>
+        <a href="/vps-config-python-vitrualenv-flask-gunicorn-supervisor-nginx" class="title">VPS环境搭建详解 (Virtualenv+Gunicorn+Supervisor+Nginx)</a>
+      </li>
+      <li>
+        <a href="/css3-animation" class="title">CSS3动画详解</a>
+      </li>
+      <li>
+        <a href="/grunt-in-action" class="title">Grunt.js 在前端项目中的实战</a>
+      </li>
+      <li>
+        <a href="/readable-code" class="title">编写可读代码的艺术</a>
+      </li>
+      <li>
+        <a href="/religion-basic" class="title">宗教基本知识</a>
+      </li>
+      <li>
+        <a href="/git-vim-tutorial" class="title">Git时代的VIM不完全使用教程</a>
+      </li>
+      <li>
+        <a href="/backbone-js-chrome-extension" class="title">使用Backbone.js开发Chrome便签插件</a>
+      </li>
+      <li>
+        <a href="/buy-guitar" class="title">如何选择与购买吉他</a>
+      </li>
+      <li>
+        <a href="/github-pages" class="title">使用Github Pages建独立博客</a>
+      </li>
+      <li>
+        <a href="/why-blog" class="title">我为什么写博客？</a>
+      </li>
+    </ul>
+  </div>
+</div>#}
+</body>
 </html>
