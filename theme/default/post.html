@@ -6,13 +6,45 @@
     <meta name="renderer" content="webkit">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
     <link rel="stylesheet" href="/css/style.css">
+    <style>
+  .pager {
+    padding-left: 0;
+    margin: 20px auto;
+    text-align: center;
+    list-style: none;
+    width: 900px;
+}
+.pager li {
+    display: inline;
+}
+.pager .previous>a, .pager .previous>span {
+    float: left;
+}
+.pager .next>a, .pager .next>span {
+    float: right;
+}
+.pager li>a, .pager li>span {
+    display: inline-block;
+    padding: 5px 14px;
+}
+
+  </style>
   </head>
   <body class="body-post">
   <div class="post-wrapper">
-    <h1 class="post-title"><a href="#">{{title}}</a></h1>
+    <h1 class="post-title">{{title}}</h1>
     <p class="post-date">{{ date|date:"yyy-MM-dd" }}</p>
     {{ content|safe }}
   </div>
+
+  <ul class="pager">
+    {% if next-post %}
+    <li class="previous"><a href="{{ next-post.url }}">上一篇: {{ next-post.title }}</a></li>
+    {% endif %}
+    {% if prev-post %}
+    <li class="next"><a href="{{prev-post.url}}">下一篇: {{ prev-post.title }}</a></li>
+    {% endif %}
+  </ul>
 
   {#
   <div class="about-wrapper">

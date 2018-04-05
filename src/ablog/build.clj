@@ -133,8 +133,6 @@
   [settings [prev-post post next-post] template_filename]
   (let [new-post (assoc post :prev-post prev-post :next-post next-post) 
     post-html (render-file (str "theme/" (:theme settings) "/" template_filename) new-post)]
-    ; (println post-html)
-    (println (:filepath post))
     (clojure.java.io/make-parents (:filepath post))
     (spit (:filepath post) post-html))
 )
