@@ -120,26 +120,32 @@
 
 
 
-(defn generate-post
-  "只为一篇当前修改的文章生成静态页面"
-  [settings [prev-post post next-post]]
+(defn generate-html
+  "为相应的模板生成页面"
+  [settings [prev-post post next-post] template_filename]
   (let [new-post (assoc post :prev-post prev-post :next-post next-post) 
-    post-html (render-file (str "theme/" (:theme settings) "/post.html") new-post)]
-    (println post-html)
-    (println (:date post))
+    post-html (render-file (str "theme/" (:theme settings) "/" template_filename) new-post)]
+    (println template_filename)
+    ; (println post-html)
     (println (:filepath post))
-    (println (:title post))
     (clojure.java.io/make-parents (:filepath post))
     (spit (:filepath post) post-html))
 )
+
+(defn generate-homepage
+  "生成首页"
+  [settings [prev-post post next-post]]
+  (println (assoc post :filepath "index.html"))
+  (generate-html settings [prev-post (assoc post :filepath (str (:public-dir settings) "/index.html")) next-post] "index.html"))
 
 (defn generate
   "整站生成静态网站"
   []
   (let [settings (get-settings)
-        post-list (get-posts-list settings)
-        post-part-list (partition 3 1 (lazy-cat [nil] post-list [nil]))
+        post-part-list (partition 3 1 (lazy-cat [nil] (get-posts-list settings) [nil]))
+        newest-post-part (last post-part-list)
     ]
-      (pmap #(generate-post settings %) post-part-list)
+      (generate-homepage settings newest-post-part)
+      (pmap #(generate-html settings % "post.html") post-part-list)
     ))
 

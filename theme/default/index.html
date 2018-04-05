@@ -1,9 +1,21 @@
 <!doctype html>
 <html>
   <head>
-    <title>Hello, World!</title>
+    <title>{{title}} - {{site-title}}</title>
   </head>
   <body>
-    <h1>Hello</h1>
+    <h1>{{title}}</h1>
+    <div class="content">
+        {{ content|safe }}
+        <p>{{ date|date:"yyy-MM-dd HH:mm" }}</p>
+        {% if prev-post %}
+        <h3><a href="{{ prev-post.url }}">上一篇: {{ prev-post.title }}</a></h3>
+        {% endif %}
+        {% if next-post %}
+        <h3><a href="{{ next-post.url }}">下一篇: {{ next-post.title }}</a></h3>
+        {% endif %}
+        {{ prev-post }}
+        {{ next-post }}
+    </div>
   </body>
 </html>
