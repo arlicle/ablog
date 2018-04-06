@@ -20,6 +20,7 @@
   :post-date-format "yyyy-MM-dd HH:mm"
   :post-filename-date-format "yyyyMMddHHmm"
   :post-permalink ":year/:month/:day/:title/"
+  :public-keep-files ["static"]
 })
 
 
@@ -40,6 +41,17 @@
       (.delete path))
     (.delete root-file))
   ))
+
+(defn wipe-public-folder [public-folder keep-files]
+  (let [public-files (reverse (file-seq (io/file public-folder))) new-keep-files (map #(str public-folder "/" %) keep-files)]
+    (doall
+      (map #(let [f (str %)]
+        (println f)
+        (if-not (or (= f public-folder) (some (fn [k] (= 0 (clojure.string/index-of f k))) new-keep-files) )
+          (println " - - " f)
+          (delete-dir f)
+        )) public-files)
+      )))
 
 (defn copy-file
   "复制文件"
@@ -190,6 +202,7 @@
   (let [settings (get-settings)
         post-part-list (partition 3 1 (lazy-cat [nil] (get-posts-list settings) [nil]))
     ]
+      (wipe-public-folder (:public-dir settings) (:public-keep-files settings))
       (generate-homepage settings (last post-part-list))
       (copy-resources-from-theme settings)
       (doall
