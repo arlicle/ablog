@@ -5,4 +5,8 @@
 
 # aaaa
 # 我喜欢跑步
+
+
+<img src="/static/aa.jpeg">
+
 bfdsafdsa...
