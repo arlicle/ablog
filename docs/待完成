@@ -1,6 +1,7 @@
 默认皮肤
 把markdown转换成html
 拷贝皮肤静态文件到对应目录
+清楚相关静态文件
 打包jar包，或者 exe 文件
 watch + 自动编译
 watch + test + 自动编译

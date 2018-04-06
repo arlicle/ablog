@@ -30,6 +30,18 @@
   []
   (merge default-settings (read-string (slurp "settings.ini"))))
 
+(defn rtrim
+  "如果只有一个 s 参数，那么只是清空空格
+  如果有两个参数，则去掉后一个参数"
+  ([s] (clojure.string/trimr s))
+  ([s k] (subs s 0 (clojure.string/last-index-of s k))))
+
+
+(defn copy-dir
+  "把文件拷贝到对应的目录"
+  [src target ignored-files]
+  (clojure.java.io/make-parents )
+  )
 
 
 (defn get-file-ext 
