@@ -5,7 +5,7 @@
                  [pandeiro/boot-http "0.8.3"]
                  [org.clojure/tools.nrepl "0.2.12"]
                  [adzerk/boot-reload "0.5.2"]
-                 [markdown-clj "1.0.1"]
+                 [markdown-clj "1.0.2"]
                  [clj-time "0.14.2"]
                  [selmer "1.11.7"]
                  ;[adzerk/boot-test "1.2.0"]
