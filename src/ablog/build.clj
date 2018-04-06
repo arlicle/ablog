@@ -132,7 +132,7 @@
           post-config (read (java.io.PushbackReader. rdr))
           post-content (md/md-to-html-string (clojure.string/join "\n" (line-seq (java.io.BufferedReader. rdr))))
           post-date (get-post-date settings post-config file)
-          post-filepath (get-public-post-filepath settings file post-date)
+          post-filepath (clojure.string/replace (get-public-post-filepath settings file post-date) #"\s+" "-")
           post-url (get-post-url settings post-filepath)
           ]
           {:content post-content :date post-date :filepath post-filepath :url post-url 
