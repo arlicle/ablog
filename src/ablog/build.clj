@@ -31,6 +31,15 @@
   (merge default-settings (read-string (slurp "settings.ini"))))
 
 
+(defn delete-dir
+  "Delete a directory tree."
+  [root]
+  (let [root-file (io/file root)]
+    (if (.isDirectory root-file)
+    (doseq [path (reverse (file-seq root-file))]
+      (.delete path))
+    (.delete root-file))
+  ))
 
 (defn copy-file
   "复制文件"
