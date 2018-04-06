@@ -36,17 +36,32 @@
   ([s] (clojure.string/trimr s))
   ([s k] (subs s 0 (clojure.string/last-index-of s k))))
 
-  (defn ltrim
-    "如果只有一个 s 参数，那么只是清空空格
-    如果有两个参数，则去掉后一个参数"
-    ([s] (clojure.string/trimr s))
-    ([s k] (subs s 0 (clojure.string/index-of s k))))
+
+(defn ltrim
+  "如果只有一个 s 参数，那么只是清空空格
+  如果有两个参数，则去掉后一个参数"
+  ([s] (clojure.string/trimr s))
+  ([s k] (subs s 0 (clojure.string/index-of s k))))
+
+
+(defn copy-file
+  "复制文件"
+  [source-path dest-path]
+  (clojure.java.io/make-parents dest-path)
+  (io/copy (io/file source-path) (io/file dest-path)))
+
 
 (defn copy-dir
-  "把文件拷贝到对应的目录"
+  "把文件夹拷贝到对应的目录"
   [src target ignored-files]
-  (clojure.java.io/make-parents (str (rtrim "/") "/aaa"))
+  (doall
+    (map #(let [filepath-str (str %) 
+      file-rel-path (subs filepath-str (count src))
+      file-target-path (str target file-rel-path)]
+      (copy-file filepath-str file-target-path)
+    ) (filter #(.isFile %) (file-seq (clojure.java.io/file src)))
   )
+  ))
 
 
 (defn get-file-ext 
