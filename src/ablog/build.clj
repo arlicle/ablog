@@ -130,7 +130,7 @@
   (if (is-valid-file settings file)
     (let [rdr (clojure.java.io/reader file)
           post-config (read (java.io.PushbackReader. rdr))
-          post-content (line-seq (java.io.BufferedReader. rdr))
+          post-content (clojure.string/join "\n" (line-seq (java.io.BufferedReader. rdr)))
           post-date (get-post-date settings post-config file)
           post-filepath (get-public-post-filepath settings file post-date)
           post-url (get-post-url settings post-filepath)
