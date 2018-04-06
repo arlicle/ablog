@@ -30,18 +30,6 @@
   []
   (merge default-settings (read-string (slurp "settings.ini"))))
 
-(defn rtrim
-  "如果只有一个 s 参数，那么只是清空空格
-  如果有两个参数，则去掉后一个参数"
-  ([s] (clojure.string/trimr s))
-  ([s k] (subs s 0 (clojure.string/last-index-of s k))))
-
-
-(defn ltrim
-  "如果只有一个 s 参数，那么只是清空空格
-  如果有两个参数，则去掉后一个参数"
-  ([s] (clojure.string/trimr s))
-  ([s k] (subs s 0 (clojure.string/index-of s k))))
 
 
 (defn copy-file
@@ -55,13 +43,14 @@
   "把文件夹拷贝到对应的目录"
   [src target ignored-files]
   (doall
-    (map #(let [filepath-str (str %) 
+    (pmap #(let [filepath-str (str %) 
       file-rel-path (subs filepath-str (count src))
       file-target-path (str target file-rel-path)]
       (copy-file filepath-str file-target-path)
     ) (filter #(.isFile %) (file-seq (clojure.java.io/file src)))
   )
-  ))
+  )
+  )
 
 
 (defn get-file-ext 
@@ -185,6 +174,7 @@
         post-part-list (partition 3 1 (lazy-cat [nil] (get-posts-list settings) [nil]))
     ]
       (generate-homepage settings (last post-part-list))
+      (copy-dir (str "theme/" (:theme settings) "/css/") (str (:public-dir settings) "/css/") nil)
       (doall
         (pmap #(generate-html settings % "post.html") post-part-list)
       )
