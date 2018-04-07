@@ -4,6 +4,7 @@ settings.ini
 .DS_Store
 .nrepl-history
 /public
+/debugmyself
 *.jar
 *.class
 /lib/
