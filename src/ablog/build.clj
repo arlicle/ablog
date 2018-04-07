@@ -31,6 +31,18 @@
   []
   (merge default-settings (read-string (slurp "settings.ini"))))
 
+(defn rtrim
+  "如果只有一个 s 参数，那么只是清空空格
+  如果有两个参数，则去掉后一个参数"
+  ([s] (clojure.string/trimr s))
+  ([s k] (subs s 0 (clojure.string/last-index-of s k))))
+
+
+(defn ltrim
+  "如果只有一个 s 参数，那么只是清空空格
+  如果有两个参数，则去掉后一个参数"
+  ([s] (clojure.string/trimr s))
+  ([s k] (subs s 0 (clojure.string/index-of s k))))
 
 (defn delete-dir
   "Delete a directory tree."
@@ -43,11 +55,11 @@
   ))
 
 (defn wipe-public-folder [public-folder keep-files]
-  (let [public-files (reverse (file-seq (io/file public-folder))) new-keep-files (map #(str public-folder "/" %) keep-files)]
+  (let [public-files (reverse (file-seq (io/file public-folder))) public-folder2 (rtrim public-folder "/") new-keep-files (map #(str public-folder2 "/" %) keep-files)]
     (doall
       (map #(let [f (str %)]
-        (if-not (or (= f public-folder) (some (fn [k] (= 0 (clojure.string/index-of f k))) new-keep-files) )
-          (do 
+        (if-not (or (= f public-folder2) (some (fn [k] (= 0 (clojure.string/index-of f k))) new-keep-files) )
+          (do
             (delete-dir f)
           )
         )) public-files)
