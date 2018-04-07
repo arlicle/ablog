@@ -118,7 +118,6 @@
 
 (defn time-formater
   [time-str]
-  (println "time-str : " time-str)
   (clj-time-format/parse multi-parser time-str))
 
 
