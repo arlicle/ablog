@@ -105,6 +105,7 @@
 
 (defn time-formater
   [time-str]
+  (println "time-str : " time-str)
   (clj-time-format/parse multi-parser time-str))
 
 
@@ -113,7 +114,7 @@
   [settings post-config file]
   (if-let [write-date (:date post-config)]
     (time-formater write-date)
-    (->> (re-find #"^(\d+)-(.*?)\.md$" (.getName file))
+    (->> (re-find #"^([\d\-]+)-(.*?)\.md$" (.getName file))
         (second)
         (time-formater)
     )))
@@ -137,7 +138,7 @@
         (:post-permalink settings) {:year (str (clj-time-core/year post-time)) 
           :month (str (clj-time-core/month post-time)) 
           :day (str (clj-time-core/day post-time)) 
-          :title (clojure.string/replace (.getName file) #"^\d+-" "")})]
+          :title (clojure.string/replace (.getName file) #"^[\d\-]+-" "")})]
           (subs f 0 (clojure.string/last-index-of f "."))
        )
        ".html"))
