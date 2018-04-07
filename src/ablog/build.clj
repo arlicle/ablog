@@ -46,10 +46,10 @@
   (let [public-files (reverse (file-seq (io/file public-folder))) new-keep-files (map #(str public-folder "/" %) keep-files)]
     (doall
       (map #(let [f (str %)]
-        (println f)
         (if-not (or (= f public-folder) (some (fn [k] (= 0 (clojure.string/index-of f k))) new-keep-files) )
-          (println " - - " f)
-          (delete-dir f)
+          (do 
+            (delete-dir f)
+          )
         )) public-files)
       )))
 
@@ -63,7 +63,6 @@
 (defn copy-dir
   "把文件夹拷贝到对应的目录"
   [src target ignored-files]
-  (println src " : " target)
   (doall
     (pmap #(let [filepath-str (str %) 
       file-rel-path (subs filepath-str (count src))
