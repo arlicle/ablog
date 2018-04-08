@@ -39,7 +39,7 @@ ablog是用 clojure 语言实现的静态网站生成器。简单、易用、高
 2. 每一篇文章的命名规范为 20180401-hello word.md 或者 2018-04-01-hello world.md 
 3. 文章头部的信息设置参数为：
 
-'{
+`{
   :title nil ; 文章标题
   :description "" ; 文章描述 可以用于站点优化
   :keywords "" ; 文章关键词 用于站点优化
@@ -53,13 +53,13 @@ ablog是用 clojure 语言实现的静态网站生成器。简单、易用、高
   :comments false ; 是否开启文章评论功能
   :authors [] ; 文章作者
   ; 还可以增加自定义变量
-}'
+}`
 
 需要哪些设置哪些即可。这里说一下slug，因为访问网址用英文或者拼音对浏览器和搜索引擎比较友好，但是我们人自己去管理文章的时候，中文又更容易识别和看到。所以我自己使用的时候，通常文件名是这样的20180401-你好世界.md 然后在文章内部定义文章生成的slug ':slug "hello world"'，这样做即方便了自己维护，也方便了浏览器
 
 4. 可以自由设置站点参数,在settings.ini文件中设置:
 
-'{
+`{
   :site-title "a git blog"
   :posts-dir "posts"
   :page-dir "pages"
@@ -70,7 +70,7 @@ ablog是用 clojure 语言实现的静态网站生成器。简单、易用、高
   :post-filename-date-format "yyyyMMddHHmm"
   :post-permalink ":year/:month/:day/:title/"
   :public-keep-files ["static"]
-}'
+}`
 
 5. 如果文章中需要使用到图片或者一些静态资源，放到 public 文件夹的 static文件夹中，也可以自由设置相关文件夹，然后在 settings.ini中的 :public-keep-files 中增加相关文件夹。
 
