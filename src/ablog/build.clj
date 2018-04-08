@@ -36,6 +36,7 @@
   :categories [] ; 文章分类
   :tags [] ; 对应标签
   :comments false ; 是否开启文章评论功能
+  :authors [] ; 文章作者
   ; 还可以增加自定义变量
 })
 
