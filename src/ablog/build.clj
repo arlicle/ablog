@@ -23,7 +23,20 @@
   :public-keep-files ["static"]
 })
 
-
+; 默认post参数
+(def default-post-settings {
+  :title nil ; 文章标题
+  :description ; 文章描述 可以用于站点优化
+  :date nil ; 发布日期 或者发布日期+时间 创建日期
+  :updated nil ; 更新日期，最后一次修改时间
+  :layout "post" ; 对应布局，目前有两种 post page 
+  :slug nil ;文章标题形成的文件名和网址，设置了，那么 post 文件名的就不管用了，方便中文的管理 "spf13-vim-3-0-release-and-new-website"
+  :draft false ; 是否是草稿，如果是，就不会生成html页面
+  :categories [] ; 文章分类
+  :tags [] ; 对应标签
+  :comments false ; 是否开启文章评论功能
+  ; 还可以增加自定义变量
+})
 
 ; 获取网站参数
 (defn get-settings
