@@ -72,6 +72,8 @@ ablog是用 clojure 语言实现的静态网站生成器。简单、易用、高
   :public-keep-files ["static"]
 }'
 
+5. 如果文章中需要使用到图片或者一些静态资源，放到 public 文件夹的 static文件夹中，也可以自由设置相关文件夹，然后在 settings.ini中的 :public-keep-files 中增加相关文件夹。
+
 ## 待完成功能
 
 * 为标签，分类，作者生成相关列表页
