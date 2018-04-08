@@ -73,28 +73,17 @@ ablog是用 clojure 语言实现的静态网站生成器。简单、易用、高
 
 4. 可以自由设置站点参数,在settings.ini文件中设置:
 
-`{
-
-  :site-title "a git blog"
-
-  :posts-dir "posts"
-
-  :page-dir "pages"
-
-  :public-dir "public"
-
-  :valid-filename-ext #{"md" "html" "ipynb"}
-
-  :theme "default"
-
-  :post-date-format "yyyy-MM-dd HH:mm"
-
-  :post-filename-date-format "yyyyMMddHHmm"
-
-  :post-permalink ":year/:month/:day/:title/"
-
-  :public-keep-files ["static"]
-  
+`{ 
+  :site-title "a git blog" 
+  :posts-dir "posts" 
+  :page-dir "pages" 
+  :public-dir "public" 
+  :valid-filename-ext #{"md" "html" "ipynb"} 
+  :theme "default" 
+  :post-date-format "yyyy-MM-dd HH:mm" 
+  :post-filename-date-format "yyyyMMddHHmm" 
+  :post-permalink ":year/:month/:day/:title/" 
+  :public-keep-files ["static"] 
 }`
 
 5. 如果文章中需要使用到图片或者一些静态资源，放到 public 文件夹的 static文件夹中，也可以自由设置相关文件夹，然后在 settings.ini中的 :public-keep-files 中增加相关文件夹。
