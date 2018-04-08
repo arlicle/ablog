@@ -8,7 +8,7 @@
 增加手机阅读的自适应
 改进页面排版 css
 打包jar包，或者 exe 文件
-watch + 自动编译
+watch + 自动编译 Filesets 
 watch + test + 自动编译
 为标签，分类，作者生成相关列表页
 可以生成整站 pdf 或者某个分类的 pdf，或者某个 tag 的 pdf 或者某个作者的 pdf 书籍

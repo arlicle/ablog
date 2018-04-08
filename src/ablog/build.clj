@@ -75,8 +75,8 @@
       (map #(let [f (str %)]
         (if-not (or (= f public-folder2) (some (fn [k] (= 0 (clojure.string/index-of f k))) new-keep-files) )
           (do
-            (println f)
-            ;(delete-dir f)
+            (println "delete: " f)
+            ; (delete-dir f)
           )
         )) public-files)
       )))
@@ -154,21 +154,49 @@
   [settings post-filepath]
   (subs post-filepath (count (:public-dir settings))))
 
-
+(defn get-post-filename
+  "获取post文件名"
+  [post-config file]
+  (let [slug (if (:slug post-config) (clojure.string/trim (:slug post-config)) nil)
+      filename (clojure.string/trim (clojure.string/replace (.getName file) #"^[\d\-]+-" ""))
+  ]
+    (->
+    (cond
+      (not slug) filename
+      (re-find #"[\w\d]+" slug) slug
+      :default filename
+    )
+    (clojure.string/replace #"\s+" "-")
+    #(if-let [last-index (clojure.string/last-index-of % ".")]
+      (subs f 0 last-index)
+      %)
+  ))
 
 (defn get-public-post-filepath
   "获取源文件文件对应的public文件"
-  [settings file post-time]
-  (str (:public-dir settings)
+  [settings post-config file post-time]
+  (->
+  (str (rtrim (:public-dir settings) "/")
        "/" 
        (let [f (reduce (fn [s [key val]] (clojure.string/replace s (re-pattern (str key)) (str val))) 
         (:post-permalink settings) {:year (str (clj-time-core/year post-time)) 
           :month (str (clj-time-core/month post-time)) 
           :day (str (clj-time-core/day post-time)) 
-          :title (clojure.string/replace (.getName file) #"^[\d\-]+-" "")})]
-          (subs f 0 (clojure.string/last-index-of f "."))
+          :title (get-post-filename post-config file)
+          })]
+          (println " f f f f :::" f)
+          (if-let [last-index (clojure.string/last-index-of f ".")]
+            (subs f 0 last-index)
+            (do
+              (println "wo wo wo :: " f)
+              f
+            )
+            )
+          
        )
-       ".html"))
+       ".html")
+  (clojure.string/replace #"\s+" "-")
+  ))
 
 
 
@@ -180,7 +208,7 @@
           post-config (read (java.io.PushbackReader. rdr))
           post-content (md/md-to-html-string (clojure.string/join "\n" (line-seq (java.io.BufferedReader. rdr))))
           post-date (get-post-date settings post-config file)
-          post-filepath (clojure.string/replace (get-public-post-filepath settings file post-date) #"\s+" "-")
+          post-filepath (get-public-post-filepath settings post-config file post-date)
           post-url (get-post-url settings post-filepath)
           ]
           {:content post-content :date post-date :filepath post-filepath :url post-url 
@@ -211,6 +239,7 @@
   (let [new-post (assoc post :prev-post prev-post :next-post next-post) 
     post-html (render-file (str "theme/" (:theme settings) "/" template_filename) new-post)]
     (clojure.java.io/make-parents (:filepath post))
+    (println "create: " (:filepath post))
     (spit (:filepath post) post-html))
 )
 
