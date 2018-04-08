@@ -26,7 +26,8 @@
 ; 默认post参数
 (def default-post-settings {
   :title nil ; 文章标题
-  :description ; 文章描述 可以用于站点优化
+  :description "" ; 文章描述 可以用于站点优化
+  :keywords "" ; 文章关键词 用于站点优化
   :date nil ; 发布日期 或者发布日期+时间 创建日期
   :updated nil ; 更新日期，最后一次修改时间
   :layout "post" ; 对应布局，目前有两种 post page 

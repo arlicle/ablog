@@ -1,18 +1,38 @@
 
-## Features
+## ablog相关说明
 
-* Blog posts and pages with Markdown
-* mange posts in diffrent directory as you like
-* Category , tags and authors
-* Code syntax highlighting
-* MathJax and Latex
-* Disqus support
-* RSS feed generation
-* theme template
+ablog是用 clojure 语言实现的静态网站生成器。简单、易用、高效、容易拓展
 
-## Prerequisites
+## 快速开始
 
-You will need clojure 1.80 and boot 2.7.2 or above installed.
+1. 环境：
+
+需要clojure1.8+ ，boot 2.7.2+
+
+
+2. 获取代码:
+
+    git clone https://github.com/arlicle/ablog.git
+
+3. 修改配置文件
+
+复制settings_sample.ini 文件为 settings.ini
+
+4. 生成静态网站
+
+    boot parse
+
+5. 运行服务器查看
+
+    boot dev
+
+6. 访问网址
+
+    http://localhost:3000
+
+7. 可以试着在posts文件夹中增加markdown文件，然后重新访问网址
+
+
 
 ## Tips
 
