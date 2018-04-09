@@ -75,6 +75,7 @@
       (map #(let [f (str %)]
         (if-not (or (= f public-folder2) (some (fn [k] (= 0 (clojure.string/index-of f k))) new-keep-files) )
           (do
+            ; (println "delete : " f)
             (delete-dir f)
           )
         )) public-files)
@@ -229,7 +230,8 @@
     post-html (render-file (str "theme/" (:theme settings) "/" template_filename) new-post)]
     (clojure.java.io/make-parents (:filepath post))
     (println "create : " (:filepath post))
-    (spit (:filepath post) post-html))
+    (spit (:filepath post) post-html)
+    )
 )
 
 
