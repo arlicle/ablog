@@ -75,7 +75,6 @@
       (map #(let [f (str %)]
         (if-not (or (= f public-folder2) (some (fn [k] (= 0 (clojure.string/index-of f k))) new-keep-files) )
           (do
-            ; (println "delete: " f)
             (delete-dir f)
           )
         )) public-files)
@@ -216,8 +215,7 @@
   其它变量的一个map组成的列表"
   [settings]
   (->> (file-seq (clojure.java.io/file (:posts-dir settings)))
-        ; (pmap #(parse-post settings %))
-        (map #(parse-post settings %))
+        (pmap #(parse-post settings %))
         (filter not-empty)
         (sort-by :date)
   ))
