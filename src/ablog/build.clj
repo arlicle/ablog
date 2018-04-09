@@ -55,9 +55,9 @@
 
 (defn ltrim
   "如果只有一个 s 参数，那么只是清空空格
-  如果有两个参数，则去掉后一个参数"
-  ([s] (clojure.string/trimr s))
-  ([s k] (if-let [i (clojure.string/index-of s k)] (subs s 0 i) s)))
+  如果有两个参数，则从左边开始去掉后一个参数"
+  ([s] (clojure.string/triml s))
+  ([s k] (if-let [i (clojure.string/index-of s k)] (if (= 0 i) (subs s (count k)) s))))
 
 (defn delete-dir
   "Delete a directory tree."
@@ -75,8 +75,8 @@
       (map #(let [f (str %)]
         (if-not (or (= f public-folder2) (some (fn [k] (= 0 (clojure.string/index-of f k))) new-keep-files) )
           (do
-            (println "delete: " f)
-            ; (delete-dir f)
+            ; (println "delete: " f)
+            (delete-dir f)
           )
         )) public-files)
       )))
@@ -152,25 +152,23 @@
 (defn get-post-url
   "获取 post 的对外访问的 url"
   [settings post-filepath]
-  (subs post-filepath (count (:public-dir settings))))
+  (-> post-filepath
+    (ltrim (:public-dir settings))
+    (rtrim "index.html")
+    (ltrim "/")
+    (#(str "/" %))
+    )
+)
 
 (defn get-post-filename
   "获取post文件名"
-  [post-config file]
-  (let [slug (if (:slug post-config) (clojure.string/trim (:slug post-config)) nil)
-      filename (clojure.string/trim (clojure.string/replace (.getName file) #"^[\d\-]+-" ""))
-  ]
-    (->
-    (cond
-      (not slug) filename
-      (re-find #"[\w\d]+" slug) slug
-      :default filename
-    )
-    (clojure.string/replace #"\s+" "-")
-    #(if-let [last-index (clojure.string/last-index-of % ".")]
-      (subs f 0 last-index)
-      %)
-  ))
+  [slug filename]
+  (let [new-slug (if (and slug (re-find #"[\w\d]+" slug)) slug)
+        new-filename (rtrim filename ".md")]
+       (-> (if slug slug new-filename)
+        (clojure.string/trim)
+        (clojure.string/replace #"\s+" "-")))
+)
 
 (defn get-public-post-filepath
   "获取源文件文件对应的public文件"
@@ -182,20 +180,12 @@
         (:post-permalink settings) {:year (str (clj-time-core/year post-time)) 
           :month (str (clj-time-core/month post-time)) 
           :day (str (clj-time-core/day post-time)) 
-          :title (get-post-filename post-config file)
+          :title (get-post-filename (:slug post-config) (clojure.string/replace (.getName file) #"^[\d\-]+-" ""))
           })]
-          (println " f f f f :::" f)
-          (if-let [last-index (clojure.string/last-index-of f ".")]
-            (subs f 0 last-index)
-            (do
-              (println "wo wo wo :: " f)
-              f
-            )
-            )
-          
+          (rtrim f "/")
        )
-       ".html")
-  (clojure.string/replace #"\s+" "-")
+       "/index.html"
+       )
   ))
 
 
@@ -226,7 +216,8 @@
   其它变量的一个map组成的列表"
   [settings]
   (->> (file-seq (clojure.java.io/file (:posts-dir settings)))
-        (pmap #(parse-post settings %))
+        ; (pmap #(parse-post settings %))
+        (map #(parse-post settings %))
         (filter not-empty)
         (sort-by :date)
   ))
@@ -239,7 +230,7 @@
   (let [new-post (assoc post :prev-post prev-post :next-post next-post) 
     post-html (render-file (str "theme/" (:theme settings) "/" template_filename) new-post)]
     (clojure.java.io/make-parents (:filepath post))
-    (println "create: " (:filepath post))
+    (println "create : " (:filepath post))
     (spit (:filepath post) post-html))
 )
 
@@ -248,7 +239,7 @@
 (defn generate-homepage
   "生成首页"
   [settings [prev-post post next-post]]
-  (generate-html settings [prev-post (assoc post :filepath (str (:public-dir settings) "/index.html")) next-post] "post.html"))
+  (generate-html settings [prev-post (assoc post :filepath (str (rtrim (:public-dir settings) "/") "/index.html")) next-post] "post.html"))
 
 
 
