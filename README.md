@@ -3,6 +3,8 @@
 
 ablog是用 clojure 语言实现的静态网站生成器。简单、易用、高效、容易拓展
 
+demo: [www.debugmyself.com](http://www.debugmyself.com)
+
 ## 快速开始
 
 1. 环境：
