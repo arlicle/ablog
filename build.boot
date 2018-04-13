@@ -10,7 +10,8 @@
                  [selmer "1.11.7"]
                  ;[adzerk/boot-test "1.2.0"]
                  ;[seancorfield/boot-expectations "1.0.11"]
-                 [metosin/bat-test "0.4.0" :scope "test"]])
+                 [metosin/bat-test "0.4.0" :scope "test"]
+                 [onetom/boot-lein-generate "0.1.3" :scope "test"]])
 
 (require '[adzerk.boot-cljs :refer [cljs]]
          '[pandeiro.boot-http :refer [serve]]
@@ -18,6 +19,9 @@
          ;'[adzerk.boot-test :refer :all]
          '[metosin.bat-test :refer (bat-test)]
          )
+
+(require 'boot.lein)
+(boot.lein/generate)
 
 (deftask parse
   "just a test"

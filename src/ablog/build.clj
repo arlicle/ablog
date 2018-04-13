@@ -66,8 +66,7 @@
     (if (.isDirectory root-file)
     (doseq [path (reverse (file-seq root-file))]
       (.delete path))
-    (.delete root-file))
-  ))
+    (.delete root-file))))
 
 (defn wipe-public-folder [public-folder keep-files]
   (let [public-files (reverse (file-seq (io/file public-folder))) public-folder2 (rtrim public-folder "/") new-keep-files (map #(str public-folder2 "/" %) keep-files)]
@@ -76,10 +75,7 @@
         (if-not (or (= f public-folder2) (some (fn [k] (= 0 (clojure.string/index-of f k))) new-keep-files) )
           (do
             ; (println "delete : " f)
-            (delete-dir f)
-          )
-        )) public-files)
-      )))
+            (delete-dir f)) )) public-files))))
 
 (defn copy-file
   "复制文件"
@@ -92,12 +88,10 @@
   "把文件夹拷贝到对应的目录"
   [src target ignored-files]
   (doall
-    (pmap #(let [filepath-str (str %) 
+    (pmap #(let [filepath-str (str %)
       file-rel-path (subs filepath-str (count src))
       file-target-path (str target file-rel-path)]
-      (copy-file filepath-str file-target-path)
-    ) (filter #(.isFile %) (file-seq (clojure.java.io/file src)))
-  )))
+      (copy-file filepath-str file-target-path)) (filter #(.isFile %) (file-seq (clojure.java.io/file src))))))
 
 (defn copy-resources-from-theme
   "复制模板的资源到对外的目录"
@@ -105,17 +99,15 @@
   (let [theme-folder (str "theme/" (:theme settings))
         public-folder (:public-dir settings)])
   (doall
-    (map #(copy-dir (str "theme/" (:theme settings) "/" %) (str (:public-dir settings) "/" %) nil) ["css" "images" "img" "js"])
-  )
-)
+    (map #(copy-dir (str "theme/" (:theme settings) "/" %) (str (:public-dir settings) "/" %) nil) ["css" "images" "img" "js"])))
 
 (defn get-file-ext 
   "获取文件后缀名"
   [filename]
   (->> filename
-    (#(.lastIndexOf % "."))
-    (#(inc %))
-    (subs filename)))
+       (#(.lastIndexOf % "."))
+       (#(inc %))
+       (subs filename)))
 
 
 
@@ -142,9 +134,8 @@
   (if-let [write-date (:date post-config)]
     (time-formater write-date)
     (->> (re-find #"^([\d\-]+)-(.*?)\.md$" (.getName file))
-        (second)
-        (time-formater)
-    )))
+         (second)
+         (time-formater))))
 
 
 
@@ -153,40 +144,34 @@
   "获取 post 的对外访问的 url"
   [settings post-filepath]
   (-> post-filepath
-    (ltrim (:public-dir settings))
-    (rtrim "index.html")
-    (ltrim "/")
-    (#(str "/" %))
-    )
-)
+      (ltrim (:public-dir settings))
+      (rtrim "index.html")
+      (ltrim "/")
+      (#(str "/" %))))
 
 (defn get-post-filename
   "获取post文件名"
   [slug filename]
   (let [new-slug (if (and slug (re-find #"[\w\d]+" slug)) slug)
         new-filename (rtrim filename ".md")]
-       (-> (if slug slug new-filename)
+    (-> (if slug slug new-filename)
         (clojure.string/trim)
-        (clojure.string/replace #"\s+" "-")))
-)
+        (clojure.string/replace #"\s+" "-"))))
 
 (defn get-public-post-filepath
   "获取源文件文件对应的public文件"
   [settings post-config file post-time]
   (->
-  (str (rtrim (:public-dir settings) "/")
-       "/" 
-       (let [f (reduce (fn [s [key val]] (clojure.string/replace s (re-pattern (str key)) (str val))) 
-        (:post-permalink settings) {:year (str (clj-time-core/year post-time)) 
-          :month (str (clj-time-core/month post-time)) 
-          :day (str (clj-time-core/day post-time)) 
-          :title (get-post-filename (:slug post-config) (clojure.string/replace (.getName file) #"^[\d\-]+-" ""))
-          })]
-          (rtrim f "/")
-       )
-       "/index.html"
-       )
-  ))
+    (str (rtrim (:public-dir settings) "/")
+         "/"
+         (let [f (reduce (fn [s [key val]] (clojure.string/replace s (re-pattern (str key)) (str val)))
+                         (:post-permalink settings)
+                         {:year (str (clj-time-core/year post-time))
+                          :month (str (clj-time-core/month post-time))
+                          :day (str (clj-time-core/day post-time))
+                          :title (get-post-filename (:slug post-config) (clojure.string/replace (.getName file) #"^[\d\-]+-" ""))})]
+           (rtrim f "/"))
+         "/index.html")))
 
 
 
@@ -199,12 +184,8 @@
           post-content (md/md-to-html-string (clojure.string/join "\n" (line-seq (java.io.BufferedReader. rdr))))
           post-date (get-post-date settings post-config file)
           post-filepath (get-public-post-filepath settings post-config file post-date)
-          post-url (get-post-url settings post-filepath)
-          ]
-          {:content post-content :date post-date :filepath post-filepath :url post-url 
-          :title (:title post-config)}
-      )
-))
+          post-url (get-post-url settings post-filepath)]
+      {:content post-content :date post-date :filepath post-filepath :url post-url :title (:title post-config)})))
 
 
 
@@ -216,23 +197,20 @@
   其它变量的一个map组成的列表"
   [settings]
   (->> (file-seq (clojure.java.io/file (:posts-dir settings)))
-        (pmap #(parse-post settings %))
-        (filter not-empty)
-        (sort-by :date)
-  ))
+       (pmap #(parse-post settings %))
+       (filter not-empty)
+       (sort-by :date)))
 
 
 
 (defn generate-html
   "为相应的模板生成页面"
   [settings [prev-post post next-post] template_filename]
-  (let [new-post (assoc post :prev-post prev-post :next-post next-post) 
-    post-html (render-file (str "theme/" (:theme settings) "/" template_filename) new-post)]
+  (let [new-post (assoc post :prev-post prev-post :next-post next-post)
+        post-html (render-file (str "theme/" (:theme settings) "/" template_filename) new-post)]
     (clojure.java.io/make-parents (:filepath post))
     (println "create : " (:filepath post))
-    (spit (:filepath post) post-html)
-    )
-)
+    (spit (:filepath post) post-html)))
 
 
 
@@ -247,13 +225,10 @@
   "整站生成静态网站"
   []
   (let [settings (get-settings)
-        post-part-list (partition 3 1 (lazy-cat [nil] (get-posts-list settings) [nil]))
-    ]
-      (wipe-public-folder (:public-dir settings) (:public-keep-files settings))
-      (generate-homepage settings (last post-part-list))
-      (copy-resources-from-theme settings)
-      (doall
-        (pmap #(generate-html settings % "post.html") post-part-list)
-      )
-    ))
+        post-part-list (partition 3 1 (lazy-cat [nil] (get-posts-list settings) [nil]))]
+    (wipe-public-folder (:public-dir settings) (:public-keep-files settings))
+    (generate-homepage settings (last post-part-list))
+    (copy-resources-from-theme settings)
+    (doall
+      (pmap #(generate-html settings % "post.html") post-part-list))))
 
