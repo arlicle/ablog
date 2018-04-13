@@ -17,8 +17,7 @@
          '[pandeiro.boot-http :refer [serve]]
          '[ablog.build :refer :all]
          ;'[adzerk.boot-test :refer :all]
-         '[metosin.bat-test :refer (bat-test)]
-         )
+         '[metosin.bat-test :refer (bat-test)])
 
 (require 'boot.lein)
 (boot.lein/generate)
@@ -26,19 +25,20 @@
 (deftask parse
   "just a test"
   []
-  (generate)
-  )
+(generate))
+
 
 
 (deftask dev
   "run the blog server"
   []
+  (let [public-dir (:public-dir (get-settings))]
   (comp
-   (serve :dir "public")
-   (watch)
-   ;(hello)
-   ;(cljs)
-   ;(target :dir #{"public"})
-   ))
+    (serve :dir public-dir)
+    (watch)
+    ;(hello)
+    ;(cljs)
+    ;(target :dir #{public-dir})
+)))
 
 
