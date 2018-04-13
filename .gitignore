@@ -1,6 +1,9 @@
 pom.xml
 pom.xml.asc
 settings.ini
+project.clj
+ablog.iml
+boot-project.iml
 .DS_Store
 .nrepl-history
 /public
@@ -16,3 +19,4 @@ settings.ini
 .lein-plugins/
 .lein-failures
 .nrepl-port
+.idea/
