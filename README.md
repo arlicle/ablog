@@ -35,6 +35,7 @@ demo: [www.debugmyself.com](http://www.debugmyself.com)
 
 复制settings_sample.ini 文件为 settings.ini，然后就可以进行自定义配置了。
 
+# 设置自己的github网站
 
 
 
