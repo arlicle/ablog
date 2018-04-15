@@ -1,10 +1,10 @@
 (set-env!
  :source-paths #{"src" "debugmyself/posts/"}
- :resource-paths #{"theme" "test" "posts"}
+ :resource-paths #{}
  :dependencies '[[adzerk/boot-cljs "2.1.4"]
                  [pandeiro/boot-http "0.8.3"]
                  [org.clojure/tools.nrepl "0.2.12"]
-                 [adzerk/boot-reload "0.5.2"]
+                 ;[adzerk/boot-reload "0.5.2"]
                  [markdown-clj "1.0.2"]
                  [clj-time "0.14.2"]
                  [selmer "1.11.7"]
@@ -16,6 +16,7 @@
 (require '[adzerk.boot-cljs :refer [cljs]]
          '[pandeiro.boot-http :refer [serve]]
          '[ablog.build :refer :all]
+         ;'[adzerk.boot-reload :refer [reload]]
          ;'[adzerk.boot-test :refer :all]
          '[metosin.bat-test :refer (bat-test)])
 
@@ -36,9 +37,10 @@
   (comp
     (serve :dir public-dir)
     (watch)
+    ;(reload)
     (build)
-    ;(cljs)
-    ;(target :dir #{public-dir})
+    ;(cljs :compiler-options {:output-to "main.js"})
+    ;(target :dir #{(str public-dir "js/")})
 )))
 
 
