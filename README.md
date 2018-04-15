@@ -37,7 +37,89 @@ demo: [www.debugmyself.com](http://www.debugmyself.com)
 
 # 设置自己的github网站
 
+1. 在github中创建一个仓库，仓库名为 arlicle.github.io，其中arlicle为自己的github用户名。
 
+
+2. 把网站代码和ablog代码clone下来
+
+我自己的使用中，ablog和我的github 网站在同一级目录，因此我把网站在同一级目录下clone下来
+
+`git clone git@github.com:arlicle/arlicle.github.io.git`
+`git clone https://github.com/arlicle/ablog.git`
+
+clone下来后，目录结构为：
+
+`find .`
+
+```
+
+.
+./ablog
+./arlicle.github.io.git
+
+```
+
+两个目录的功能分别为：
+
+* ablog : 运行服务
+* arlicle.github.io.git : 自己的网站目录，自己的创作空间
+
+
+3. 配置自己的网站目录
+
+进入ablog，复制settings_sample.ini文件，然后将复制出来的文件改名为 settings.ini，
+`cd ablog`
+`cp settings_sample.ini settings.ini`
+
+然后打开文件settings.ini，
+
+修改 
+
+:posts-dir "posts/" 为 "../arlicle.github.io/posts/"
+
+:public-dir "public/" 为 "../arlicle.github.io/"
+
+:post-permalink ":year/:month/:day/:title/" 为  "p/:year/:month/:day/:title/"
+
+修改完后的 settings.ini文件为
+
+```
+{
+  :site-title "a git blog"
+  :posts-dir "../arlicle.github.io/posts/"
+  :page-dir "pages"
+  :public-dir "../arlicle.github.io/"
+  :valid-filename-ext #{"md" "html" "gdb"}
+  :theme "default"
+  :post-date-format "yyyy-MM-dd HH:mm"
+  :post-filename-date-format "yyyyMMddHHmm"
+  :post-permalink "p/:year/:month/:day/:title/"
+  :public-keep-files ["static" "posts" "CNAME" ".git" "post.sh"]
+}
+```
+
+4. 运行
+
+在ablog目录中，执行命令
+
+`boot dev`
+
+然后在浏览器中访问网址 `http://localhost:3000/` ，就可以看到自己的网站了。
+
+5. 修改，编辑文章
+
+可以在 arlicle.github.io 文件夹中，进行自己创作，在posts文件夹中，增加自己的 markdown文件，比如文件名为：`20180415-我的第一篇日志.md` ，其中 `20180415`为创作的日期，`我的第一篇日志` 为日志自己的标题（使用中文是为了方便自己查找和维护，最终生成的文件名还可以在文章中再进行自定义，标题名称也可以自定义）。日志内容为：
+
+```
+{
+    :slug "my first post"
+}
+
+哈哈，我的第一篇日志。
+
+```
+
+保存文件，然后刷新,就可以看到自己的日志拉。把文章推送到 github，过几分钟，访问网址：'http://arlicle.github.io' ，就可以看到自己的网站了。
 
 # 相关说明
 
