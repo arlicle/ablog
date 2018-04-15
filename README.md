@@ -20,19 +20,20 @@ demo: [www.debugmyself.com](http://www.debugmyself.com)
 
 复制settings_sample.ini 文件为 settings.ini
 
-4. 生成静态网站
-
-    `boot parse`
-
-5. 运行服务器查看
+4. 运行服务器查看
 
     `boot dev`
 
-6. 访问网址
+5. 访问网址
 
     `http://localhost:3000`
 
-7. 可以试着在posts文件夹中增加markdown文件，然后重新访问网址
+6. 可以试着在posts文件夹中增加或者修改markdown文件，然后重新访问网址，就会看到更新。运行`boot dev`，系统会自动监测markdown文件的改动，然后自动生成html文件。因此无需重新运行，直接刷新网址就可以看到改变效果。
+
+
+7. 也可以手动生成静态网站。运行命令
+
+    `boot parse`
 
 
 # 相关说明
