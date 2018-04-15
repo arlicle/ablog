@@ -1,6 +1,6 @@
-(ns ablog.build-test
+(ns ablog.core-test
     (:require [clojure.test :refer :all]
-              [ablog.build :refer :all]
+              [ablog.core :refer :all]
               [clj-time.core :as clj-time-core]
               [clj-time.local :as l]))
 

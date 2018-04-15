@@ -1,6 +1,5 @@
 (set-env!
- :source-paths #{"src" "posts"}
- :resource-paths #{}
+ :source-paths #{"src"}
  :dependencies '[[adzerk/boot-cljs "2.1.4"]
                  [pandeiro/boot-http "0.8.3"]
                  [org.clojure/tools.nrepl "0.2.12"]
@@ -11,11 +10,12 @@
                  ;[adzerk/boot-test "1.2.0"]
                  ;[seancorfield/boot-expectations "1.0.11"]
                  [metosin/bat-test "0.4.0" :scope "test"]
-                 [onetom/boot-lein-generate "0.1.3" :scope "test"]])
+                 [onetom/boot-lein-generate "0.1.3" :scope "test"]
+                 [org.clojure/clojure "1.8.0" :scope "provided"]])
 
 (require '[adzerk.boot-cljs :refer [cljs]]
          '[pandeiro.boot-http :refer [serve]]
-         '[ablog.build :refer :all]
+         '[ablog.core :refer [generate get-settings watch-generate]]
          ;'[adzerk.boot-reload :refer [reload]]
          ;'[adzerk.boot-test :refer :all]
          '[metosin.bat-test :refer (bat-test)])
@@ -43,9 +43,7 @@
     (serve :dir public-dir)
     (watch)
     ;(reload)
-    (build)
+    (watch-generate)
     ;(cljs :compiler-options {:output-to "main.js"})
     ;(target :dir #{(str public-dir "js/")})
 )))
-
-

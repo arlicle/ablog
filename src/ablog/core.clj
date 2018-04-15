@@ -1,4 +1,4 @@
-(ns ablog.build
+(ns ablog.core
   (:require [markdown.core :as md]
             [clojure.java.io :as io]
             [clj-time.format :as clj-time-format]
@@ -246,7 +246,7 @@
 
 
 
-(core/deftask build
+(core/deftask watch-generate
   []
   (let [tmp-result (core/tmp-dir!)
         compilers  (atom {})
