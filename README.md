@@ -16,24 +16,26 @@ demo: [www.debugmyself.com](http://www.debugmyself.com)
 
 `git clone https://github.com/arlicle/ablog.git`
 
-3. 修改配置文件
-
-复制settings_sample.ini 文件为 settings.ini
-
-4. 运行服务器查看
+3. 进入到目录，然后运行服务器
 
     `boot dev`
 
-5. 访问网址
+4. 访问网址
 
     `http://localhost:3000`
 
-6. 可以试着在posts文件夹中增加或者修改markdown文件，然后重新访问网址，就会看到更新。运行`boot dev`，系统会自动监测markdown文件的改动，然后自动生成html文件。因此无需重新运行，直接刷新网址就可以看到改变效果。
+5. 可以试着在posts文件夹中增加或者修改markdown文件，然后重新访问网址，就会看到更新。运行`boot dev`，系统会自动监测markdown文件的改动，然后自动生成html文件。因此无需重新运行，直接刷新网址就可以看到改变效果。
 
 
-7. 也可以手动生成静态网站。运行命令
+6. 也可以手动生成静态网站。运行命令
 
     `boot parse`
+
+7. 自定义配置文件，可以自定义公共目录地址，写作地址等
+
+复制settings_sample.ini 文件为 settings.ini，然后就可以进行自定义配置了。
+
+
 
 
 # 相关说明
