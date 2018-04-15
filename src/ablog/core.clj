@@ -194,14 +194,11 @@
           post-config (read (java.io.PushbackReader. rdr))
           post-content (if (= (type post-config) clojure.lang.PersistentArrayMap)
             (md/md-to-html-string (clojure.string/join "\n" (line-seq (java.io.BufferedReader. rdr))))
-            (slurp file)
-          )
+            (slurp file))
           post-title (get-post-title post-config file)
           post-date (get-post-date settings post-config file)
           post-filepath (get-public-post-filepath settings post-config file post-date)
           post-url (get-post-url settings post-filepath)]
-        (println post-config)
-        (println (type post-config))
       (if (not (:draft post-config))
         {:content post-content :date post-date :filepath post-filepath :url post-url :title post-title}))))
 
@@ -215,7 +212,7 @@
   其它变量的一个map组成的列表"
   [settings]
   (->> (file-seq (clojure.java.io/file (:posts-dir settings)))
-       (map #(parse-post settings %))
+       (pmap #(parse-post settings %))
        (filter not-empty)
        (sort-by :date)))
 
