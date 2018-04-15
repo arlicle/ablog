@@ -1,9 +1,10 @@
 (ns ablog.build
   (:require [markdown.core :as md]
-    [clojure.java.io :as io]
-    [clj-time.format :as clj-time-format]
-    [clj-time.core :as clj-time-core]
-    [selmer.parser :refer [render render-file]]))
+            [clojure.java.io :as io]
+            [clj-time.format :as clj-time-format]
+            [clj-time.core :as clj-time-core]
+            [selmer.parser :refer [render render-file]]
+            [boot.core :as core]))
 
 (selmer.parser/set-resource-path! (System/getProperty "user.dir"))
 
@@ -30,7 +31,7 @@
   :keywords "" ; 文章关键词 用于站点优化
   :date nil ; 发布日期 或者发布日期+时间 创建日期
   :updated nil ; 更新日期，最后一次修改时间
-  :layout "post" ; 对应布局，目前有两种 post page 
+  :layout "post" ; 对应布局，目前有两种 post page
   :slug nil ;文章标题形成的文件名和网址，设置了，那么 post 文件名的就不管用了，方便中文的管理 "spf13-vim-3-0-release-and-new-website"
   :draft nil ; 是否是草稿，如果是，就不会生成html页面
   :categories [] ; 文章分类
@@ -101,7 +102,7 @@
   (doall
     (map #(copy-dir (str "theme/" (:theme settings) "/" %) (str (:public-dir settings) "/" %) nil) ["css" "images" "img" "js"])))
 
-(defn get-file-ext 
+(defn get-file-ext
   "获取文件后缀名"
   [filename]
   (->> filename
@@ -202,7 +203,12 @@
        (filter not-empty)
        (sort-by :date)))
 
-
+(defn get-posts-list2
+  [settings post-list]
+  (->> post-list
+       (pmap #(parse-post settings %))
+       (filter not-empty)
+       (sort-by :date)))
 
 (defn generate-html
   "为相应的模板生成页面"
@@ -233,3 +239,34 @@
     (doall
       (pmap #(generate-html settings % "post.html") post-part-list))))
 
+
+(defn- macro-files-changed
+  [diff]
+  (->> (core/input-files diff)
+       (core/by-ext ["md"])
+       (map core/tmp-path)))
+
+
+(defn generate-post-list
+  [post-list]
+  (let [settings (get-settings)
+  post-part-list (partition 3 1 (lazy-cat [nil] post-list [nil]))]
+  ;(generate-homepage settings (last post-part-list))
+  (doall
+  (pmap #(generate-html settings % "post.html") post-part-list))))
+
+
+(core/deftask build
+  []
+  (let [tmp-result (core/tmp-dir!)
+        compilers  (atom {})
+        prev       (atom nil)
+        prev-deps  (atom (core/get-env :dependencies))
+        settings (get-settings)]
+    (comp
+      (core/with-pre-wrap fileset
+        (let [diff          (core/fileset-diff @prev fileset)
+              macro-changes (macro-files-changed diff)])
+        (generate)
+        (reset! prev fileset)
+        (-> fileset core/commit!)))))

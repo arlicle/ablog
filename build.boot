@@ -1,6 +1,6 @@
 (set-env!
- :source-paths #{"src"}
- :resource-paths #{"theme" "test"}
+ :source-paths #{"src" "debugmyself/posts/"}
+ :resource-paths #{"theme" "test" "posts"}
  :dependencies '[[adzerk/boot-cljs "2.1.4"]
                  [pandeiro/boot-http "0.8.3"]
                  [org.clojure/tools.nrepl "0.2.12"]
@@ -36,7 +36,7 @@
   (comp
     (serve :dir public-dir)
     (watch)
-    ;(hello)
+    (build)
     ;(cljs)
     ;(target :dir #{public-dir})
 )))
