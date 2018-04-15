@@ -43,7 +43,8 @@
 
 ; 获取网站参数
 (defn get-settings
-  "获取网站的各项设置"
+  "获取网站的各项设置
+  如果没有获得的"
   []
   (merge default-settings (try
     (read-string (slurp "settings.ini"))
