@@ -1,5 +1,5 @@
 (set-env!
- :source-paths #{"src" "debugmyself/posts/"}
+ :source-paths #{"src" "posts"}
  :resource-paths #{}
  :dependencies '[[adzerk/boot-cljs "2.1.4"]
                  [pandeiro/boot-http "0.8.3"]
@@ -24,7 +24,7 @@
 (boot.lein/generate)
 
 (deftask parse
-  "just a test"
+  "generate html"
   []
 (generate))
 
