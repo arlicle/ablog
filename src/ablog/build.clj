@@ -203,12 +203,6 @@
        (filter not-empty)
        (sort-by :date)))
 
-(defn get-posts-list2
-  [settings post-list]
-  (->> post-list
-       (pmap #(parse-post settings %))
-       (filter not-empty)
-       (sort-by :date)))
 
 (defn generate-html
   "为相应的模板生成页面"
@@ -241,19 +235,12 @@
 
 
 (defn- macro-files-changed
+  "获取变动的文件: 增加或修改"
   [diff]
   (->> (core/input-files diff)
        (core/by-ext ["md"])
        (map core/tmp-path)))
 
-
-(defn generate-post-list
-  [post-list]
-  (let [settings (get-settings)
-  post-part-list (partition 3 1 (lazy-cat [nil] post-list [nil]))]
-  ;(generate-homepage settings (last post-part-list))
-  (doall
-  (pmap #(generate-html settings % "post.html") post-part-list))))
 
 
 (core/deftask build
