@@ -20,6 +20,8 @@
          ;'[adzerk.boot-test :refer :all]
          '[metosin.bat-test :refer (bat-test)])
 
+
+
 (require 'boot.lein)
 (boot.lein/generate)
 
@@ -33,7 +35,10 @@
 (deftask dev
   "run the blog server"
   []
-  (let [public-dir (:public-dir (get-settings))]
+  (let [settings (get-settings)
+        public-dir (:public-dir settings)
+        posts-dir (:posts-dir settings)]
+  (set-env! :source-paths #{posts-dir})
   (comp
     (serve :dir public-dir)
     (watch)

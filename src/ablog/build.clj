@@ -45,7 +45,9 @@
 (defn get-settings
   "获取网站的各项设置"
   []
-  (merge default-settings (read-string (slurp "settings.ini"))))
+  (merge default-settings (try
+    (read-string (slurp "settings.ini"))
+    (catch Exception e nil))))
 
 (defn rtrim
   "如果只有一个 s 参数，那么只是清空空格
