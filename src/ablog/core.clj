@@ -131,6 +131,8 @@
   [time-str]
   (clj-time-format/parse multi-parser time-str))
 
+(defn get-filename [file]
+  (rtrim (clojure.string/replace (.getName file) #"^[\d\-]+-" "") ".md"))
 
 (defn get-post-date
   "获取 post 提交时间"
@@ -141,7 +143,12 @@
          (second)
          (time-formater))))
 
-
+(defn get-post-title
+  "获取post标题"
+  [post-config file]
+  (if (= (type post-config) clojure.lang.PersistentArrayMap)
+    (:title post-config)
+    (get-filename file)))
 
 
 (defn get-post-url
@@ -173,7 +180,7 @@
                          {:year (str (clj-time-core/year post-time))
                           :month (str (clj-time-core/month post-time))
                           :day (str (clj-time-core/day post-time))
-                          :title (get-post-filename (:slug post-config) (clojure.string/replace (.getName file) #"^[\d\-]+-" ""))})]
+                          :title (get-post-filename (:slug post-config) (get-filename file))})]
            (rtrim f "/"))
          "/index.html")))
 
@@ -185,12 +192,18 @@
   (if (is-valid-file settings file)
     (let [rdr (clojure.java.io/reader file)
           post-config (read (java.io.PushbackReader. rdr))
-          post-content (md/md-to-html-string (clojure.string/join "\n" (line-seq (java.io.BufferedReader. rdr))))
+          post-content (if (= (type post-config) clojure.lang.PersistentArrayMap)
+            (md/md-to-html-string (clojure.string/join "\n" (line-seq (java.io.BufferedReader. rdr))))
+            (slurp file)
+          )
+          post-title (get-post-title post-config file)
           post-date (get-post-date settings post-config file)
           post-filepath (get-public-post-filepath settings post-config file post-date)
           post-url (get-post-url settings post-filepath)]
+        (println post-config)
+        (println (type post-config))
       (if (not (:draft post-config))
-        {:content post-content :date post-date :filepath post-filepath :url post-url :title (:title post-config)}))))
+        {:content post-content :date post-date :filepath post-filepath :url post-url :title post-title}))))
 
 
 
@@ -202,7 +215,7 @@
   其它变量的一个map组成的列表"
   [settings]
   (->> (file-seq (clojure.java.io/file (:posts-dir settings)))
-       (pmap #(parse-post settings %))
+       (map #(parse-post settings %))
        (filter not-empty)
        (sort-by :date)))
 
