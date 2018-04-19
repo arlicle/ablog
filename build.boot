@@ -11,24 +11,54 @@
                  ;[seancorfield/boot-expectations "1.0.11"]
                  [metosin/bat-test "0.4.0" :scope "test"]
                  [onetom/boot-lein-generate "0.1.3" :scope "test"]
-                 [org.clojure/clojure "1.8.0" :scope "provided"]])
+                 ])
+
 
 (require '[adzerk.boot-cljs :refer [cljs]]
          '[pandeiro.boot-http :refer [serve]]
-         '[ablog.core :refer [generate get-settings watch-generate]]
+         '[ablog.core :refer [generate get-settings]]
          ;'[adzerk.boot-reload :refer [reload]]
          ;'[adzerk.boot-test :refer :all]
          '[metosin.bat-test :refer (bat-test)])
 
 
+(defn- macro-files-changed
+  "获取变动的文件: 增加或修改"
+  [diff]
+  (->> (input-files diff)
+       (by-ext ["md"])
+       (map tmp-path)))
 
-(require 'boot.lein)
-(boot.lein/generate)
+
+(deftask watch-generate
+  []
+  (let [tmp-result (tmp-dir!)
+        compilers  (atom {})
+        prev       (atom nil)
+        prev-deps  (atom (get-env :dependencies))
+        settings (get-settings)]
+    (comp
+      (with-pre-wrap fileset
+        (let [diff          (fileset-diff @prev fileset)
+              macro-changes (macro-files-changed diff)])
+        (generate)
+        (reset! prev fileset)
+        (-> fileset commit!)))))
 
 (deftask parse
   "generate html"
   []
 (generate))
+
+(deftask build
+  "Builds an uberjar of this project that can be run with java -jar"
+  []
+  (comp
+   (aot :namespace #{'main.entrypoint})
+   (uber)
+   (jar :file "project.jar" :main 'main.entrypoint)
+   (sift :include #{#"project.jar"})
+   (target)))
 
 
 

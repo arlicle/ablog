@@ -4,7 +4,7 @@
             [clj-time.format :as clj-time-format]
             [clj-time.core :as clj-time-core]
             [selmer.parser :refer [render render-file]]
-            [boot.core :as core]))
+            ))
 
 (selmer.parser/set-resource-path! (System/getProperty "user.dir"))
 
@@ -146,7 +146,7 @@
 (defn get-post-title
   "获取post标题"
   [post-config file]
-  (if (= (type post-config) clojure.lang.PersistentArrayMap)
+  (if (and (= (type post-config) clojure.lang.PersistentArrayMap) (:title post-config))
     (:title post-config)
     (get-filename file)))
 
@@ -247,26 +247,6 @@
       (pmap #(generate-html settings % "post.html") post-part-list))))
 
 
-(defn- macro-files-changed
-  "获取变动的文件: 增加或修改"
-  [diff]
-  (->> (core/input-files diff)
-       (core/by-ext ["md"])
-       (map core/tmp-path)))
 
 
 
-(core/deftask watch-generate
-  []
-  (let [tmp-result (core/tmp-dir!)
-        compilers  (atom {})
-        prev       (atom nil)
-        prev-deps  (atom (core/get-env :dependencies))
-        settings (get-settings)]
-    (comp
-      (core/with-pre-wrap fileset
-        (let [diff          (core/fileset-diff @prev fileset)
-              macro-changes (macro-files-changed diff)])
-        (generate)
-        (reset! prev fileset)
-        (-> fileset core/commit!)))))
