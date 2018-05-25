@@ -338,11 +338,58 @@ $v10432_3=4324;
   )
 
 
+(map (fn [[k v]] (println k v)) {:width 10, :height 20, :depth 15})
 
-(= ((fn [f m & args] (reduce (fn [r i] (println i)) m args )) * {:a 2, :b 3, :c 4} {:a 2} {:b 2} {:c 5})
+(drop 2 [2 5 4 1 3 6])
+
+
+(= :x (__ [[:x :e :o]
+           [:x :e :e]
+           [:x :e :o]]))
+
+(interleave [:x :e :o]
+  [:x :e :e]
+  [:x :e :o])
+
+
+(= :x (__ [[:e :e :x]
+           [:o :x :e]
+           [:o :e :x]]))
+
+(interleave [:e :e :x]
+[:o :x :e]
+[:x :e :e])
+
+
+
+(= ((fn [s] (sort #(compare (clojure.string/lower-case %1) (clojure.string/lower-case %2)) (re-seq #"\w+" s)))  "Fools fall for foolish follies.")
+   ["fall" "follies" "foolish" "Fools" "for"])
+
+
+
+(clojure.string/split "Helo aa" " ")
+(= ((fn [s] (sort #(compare (clojure.string/lower-case (first %1)) (clojure.string/lower-case (first %2))) (re-seq #"\w+" s)))  "Have a nice day.")
+   ["a" "day" "Have" "nice"])
+
+(sort '("Have" "a" "day." "nice"))
+
+(sort #(compare (clojure.string/lower-case (first %1)) (clojure.string/lower-case (first %2))) '("Have" "a" "day." "nice"))
+
+(= ((fn [f m & args] (reduce (fn [r i] (reduce (fn [r2 [k v]] (if (get r2 k) (update-in r2 [k] #(f % v)) (assoc r2 k v))) r (vec i))) m args )) * {:a 2, :b 3, :c 4} {:a 2} {:b 2} {:c 5})
    {:a 4, :b 6, :c 20})
 
+(map #(println %) (vec {1 3, 2 10, 3 15}))
 
+
+(= ((fn [f m & args] (reduce (fn [r i] (let [[[k v]] (vec i)] (if (get r k) (update-in r [k] #(f % v)) (assoc r k v)))) m args )) - {1 10, 2 20} {1 3, 2 10, 3 15})
+   {:a 4, :b 6, :c 20})
+
+(update-in {:a 3} [:a] #(* % 2))
+
+(let [[[k v]] (vec {:a 3})] (println k))
+(get {:a 3} :a)
+
+(vec {:a 3})
 
 
 
