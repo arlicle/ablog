@@ -6,7 +6,157 @@
   (println more))
 
 
+(+ 1 1)
+(def val :e)
 
+(defn pos [coll val]
+  (if (or (map? coll) (set? coll))
+    (some #(if (= (second %) val) (first %)) coll)
+    (some #(if (nil? %) nil %) (map-indexed (fn [idx item] (if (= item val) idx)) coll))
+    ))
+
+(or (map? {:a 1 :b 2 :c 3 :d 4}) (set? {:a 1 :b 2 :c 3 :d 4}))
+
+(let [[a & b] [[1 2 3 4 5]]]
+  (println b)
+  (println a))
+
+(seq nil)
+
+(defn fnth [n]
+  (apply comp
+         (cons first (take (dec n) (repeat rest)))))
+
+(def world [[1 1 1 1 1]
+            [999 999 999 999 1]
+            [1 1 1 1 1]
+            [1 999 999 999 999]
+            [1 1 1 1 1]])
+
+(defn estimate-cost [step-cost-est size y x]
+  (* step-cost-est
+     (- (+ size size) y x 2)))
+
+(estimate-cost 900 5 0 0)
+
+(estimate-cost 900 5 4 4)
+
+(defn slope [p1 p2]
+  {:pre [(not= p1 p2) (vector? p1) (vector? p2)]
+   :post [(float? %)]} (/ (- (p2 1) (p1 1))
+                          (- (p2 0) (p1 0))))
+
+(slope [10.0 1] [1 20])
+
+((fnth 5) [:a :b :c :d :e :f :g])
+
+(map (comp keyword #(.toLowerCase %) name) '[a B D c])
+
+(join "," [1 2 3])
+
+(defn join
+  {:test (fn []
+           (assert
+             (= (join "," [1 2 3]) "1,2,3")))}
+  [sep s]
+  (apply str (interpose sep s)))
+
+
+(interpose "," [1 2 3])
+(use '[clojure.test :as t])
+(t/run-tests)
+
+(sort [1 3 :a :b])
+
+
+(list [1 2 3])
+
+(let [[a & b] (seq nil)]
+  (println a)
+  (println b))
+
+(seq '(1 2))
+
+(defn sort-parts [work]
+  (lazy-seq
+    (loop [[part & parts] work]
+      (if-let [[pivot & xs] (seq part)]
+        (let [smaller? #(< % pivot)] (recur (list*
+                                              (filter smaller? xs)
+                                              (cons x (sort-parts parts)))))))))
+
+(defn defer-expensive [cheep expensive]
+  (if-let [good-enough (force cheep)]
+    good-enough
+    (force expensive)))
+
+(defer-expensive (delay false)
+                 (delay (do (Thread/sleep 5000) :expensive)))
+
+(force (delay :cheap))
+
+(defer-expensive (delay false)
+                 (dal))
+
+(- 13 (+ 2 2))
+
+(defn random-int [n]
+  (take n (repeatedly #(rand-int n))))
+
+(random-int 4)
+
+(random-int 3)
+(rand-int 3)
+(steps [1 2 3 4])
+
+(pos [:a :b :c :d :e] :e)
+(pos {:a 1 :b 2 :c 3 :d 4} 3)
+
+(defn rec-step [[x & cs]]
+  (if x
+    [x (rec-step cs)]
+    []))
+
+(rec-step [1 2 3 4 5])
+(rec-step (range 10))
+
+(defn lz-step [s]
+  (lazy-seq
+    (if (seq s)
+      [(first s) (lz-step (rest s))])))
+
+(type (lz-step [1 2 3 4]))
+
+(dorun (lz-step (range 200000)))
+
+
+
+(some #(if (= (second %) 3) (first %)) {:a 1 :b 2 :c 3 :d 4})
+
+(some #{2} [1 2 3 4])
+
+(some #(if (nil? %) nil %) (map-indexed (fn [idx item] (if (= item val) idx)) coll))
+
+(some #(if (= (second %) 2) (first %)) {:a 1 :b 2 :c 3})
+
+(defn index [coll]
+  (cond
+    (map? coll) (seq coll)
+    (set? coll) (map vector coll coll)
+    :else (map vector (range) coll)))
+
+(defn pos2 [val coll]
+  (for [[k v] (index coll) :when (= v val)] k))
+
+(pos2 :ab [:a :b :c])
+
+(index [:a :b :c])
+(index {:a 1 :b 2 :c 3 :d 4})
+(index '(:ha :ho :la))
+(map vector (range) [:a :b :c :d :e])
+
+(map vector #{:a :b :c} #{:a :b :c})
+(map #() #{:a 1 :b 2})
 
 (let [range-vec (vec (range 10))
       [a b c & more :as all] range-vec]
@@ -14,6 +164,15 @@
   (println more)
   (println all))
 
+
+(* 1024 4 25 0.26)
+(map vector #{:a :b :c :d :e} #{:a :b :c :d :e})
+
+(keep-indexed #(println %1 %2) [:a :b :c :d :e])
+
+(map vector (range) [:a :b :c :d :e])
+
+(map vector (range 10) [:a :b :c :d :e])
 
 (defn xors [x-max y-max] (for [x (range x-max) y (range y-max)] [x y (bit-xor x y)]))
 
