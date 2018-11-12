@@ -393,7 +393,7 @@ a.external:hover {
 }
 
 .about-wrapper {
-	background: #7e96a9;
+	/* background: #7e96a9; */
 	width: 900px;
 	margin: 0 auto;
 	padding: 30px 60px;
@@ -458,7 +458,7 @@ a.external:hover {
 }
 
 .about-wrapper .aboutme a {
-	color: #fff;
+	/* color: #fff; */
 	font-size: 14px
 }
 

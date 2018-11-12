@@ -220,7 +220,7 @@
 (defn generate-html
   "为相应的模板生成页面"
   [settings [prev-post post next-post] template_filename]
-  (let [new-post (assoc post :prev-post prev-post :next-post next-post)
+  (let [new-post (assoc post :prev-post prev-post :next-post next-post :site-title (:site-title settings))
         post-html (render-file (str "theme/" (:theme settings) "/" template_filename) new-post)]
     (clojure.java.io/make-parents (:filepath post))
     (println "create : " (:filepath post))
