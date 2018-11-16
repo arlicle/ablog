@@ -578,6 +578,7 @@ li.L0,li.L1,li.L2,li.L3,li.L4,li.L5,li.L6,li.L7,li.L8,li.L9 {
 .footer {
     clear: both;
     margin-bottom:100px;
+    margin-top:100px;
     text-align: center;
     font-size: 12px;
     color: #888;
