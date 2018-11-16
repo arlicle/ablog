@@ -70,7 +70,7 @@
         posts-dir (:posts-dir settings)]
   (set-env! :source-paths #{posts-dir})
   (comp
-    (serve :dir public-dir)
+    (serve :dir public-dir :port 3006)
     (watch)
     ;(reload)
     (watch-generate)

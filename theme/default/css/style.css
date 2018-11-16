@@ -298,34 +298,6 @@ a.external:hover {
 	line-height: 1.8em
 }
 
-.post-wrapper code {
-	background: #eee;
-	border: 1px solid #ccc;
-	padding: 0 5px;
-	font-family: "Courier";
-	line-height: 14px;
-	font-size: 14px;
-	word-wrap: break-word
-}
-
-.post-wrapper pre {
-	background: #f7f3f7;
-	padding: 20px 30px 15px;
-	overflow: auto;
-	margin-bottom: 40px;
-	font-size: 14px;
-	border: 1px solid #eee;
-	color: #b9bdb6;
-	margin-top: -20px;
-}
-
-.post-wrapper pre code {
-	background-color: transparent;
-	border: none;
-	padding: 0;
-	word-wrap: normal;
-}
-
 @media screen and (max-width:767px) {
 	.post-wrapper pre code {
 		line-height: 1em;
@@ -606,4 +578,7 @@ li.L0,li.L1,li.L2,li.L3,li.L4,li.L5,li.L6,li.L7,li.L8,li.L9 {
 .footer {
     clear: both;
     margin-bottom:100px;
+    text-align: center;
+    font-size: 12px;
+    color: #888;
 }
