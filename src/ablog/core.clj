@@ -11,35 +11,38 @@
 
 
 ; 默认网站参数
-(def default-settings {
-  :site-title "a git blog"
-  :posts-dir "posts"
-  :page-dir "pages"
-  :public-dir "public"
-  :valid-filename-ext #{"md" "html" "gdb"}
-  :theme "default"
-  :post-date-format "yyyy-MM-dd HH:mm"
-  :post-filename-date-format "yyyyMMddHHmm"
-  :post-permalink ":year/:month/:day/:title/"
-  :public-keep-files ["static"]
-})
+(def default-settings
+  {
+   :site-title                "a git blog"
+   :posts-dir                 "posts"
+   :page-dir                  "pages"
+   :public-dir                "public"
+   :valid-filename-ext        #{"md" "html" "gdb"}
+   :theme                     "default"
+   :post-date-format          "yyyy-MM-dd HH:mm"
+   :post-filename-date-format "yyyyMMddHHmm"
+   :post-permalink            ":year/:month/:day/:title/"
+   :public-keep-files         ["static"]
+   })
 
 ; 默认post参数
-(def default-post-settings {
-  :title nil ; 文章标题
-  :description "" ; 文章描述 可以用于站点优化
-  :keywords "" ; 文章关键词 用于站点优化
-  :date nil ; 发布日期 或者发布日期+时间 创建日期
-  :updated nil ; 更新日期，最后一次修改时间
-  :layout "post" ; 对应布局，目前有两种 post page
-  :slug nil ;文章标题形成的文件名和网址，设置了，那么 post 文件名的就不管用了，方便中文的管理 "spf13-vim-3-0-release-and-new-website"
-  :draft nil ; 是否是草稿，如果是，就不会生成html页面
-  :categories [] ; 文章分类
-  :tags [] ; 对应标签
-  :comments false ; 是否开启文章评论功能
-  :authors [] ; 文章作者
-  ; 还可以增加自定义变量
-})
+(def default-post-settings
+  {
+   :title       nil ; 文章标题
+   :description "" ; 文章描述 可以用于站点优化
+   :keywords    "" ; 文章关键词 用于站点优化
+   :date        nil ; 发布日期 或者发布日期+时间 创建日期
+   :updated     nil ; 更新日期，最后一次修改时间
+   :layout      "post" ; 对应布局，目前有两种 post page
+   :slug        nil ;文章标题形成的文件名和网址，设置了，那么 post 文件名的就不管用了，方便中文的管理 "spf13-vim-3-0-release-and-new-website"
+   :draft       nil ; 是否是草稿，如果是，就不会生成html页面
+   :categories  [] ; 文章分类
+   :tags        [] ; 对应标签
+   :comments    false ; 是否开启文章评论功能
+   :author      ""                                                ;文章作者, 一位，主作者
+   :authors     [] ; 文章作者，多位
+   ; 还可以增加自定义变量
+   })
 
 ; 获取网站参数
 (defn get-settings
@@ -151,6 +154,32 @@
     (get-filename file)))
 
 
+
+(defn get-post-authors
+  "获取 post 作者"
+  [settings post-config]
+  (let [authors1 (:authors post-config)
+        authors2 (:authors settings)
+        authors
+        (cond
+          (and authors1 (seq authors1))
+          authors1
+
+          (and authors2 (seq authors2))
+          authors2
+          )]
+    (cond
+      (nil? authors)
+      nil
+
+      (string? authors)
+      [authors]
+
+      :else
+      authors
+      )))
+
+
 (defn get-post-url
   "获取 post 的对外访问的 url"
   [settings post-filepath]
@@ -198,9 +227,12 @@
           post-title (get-post-title post-config file)
           post-date (get-post-date settings post-config file)
           post-filepath (get-public-post-filepath settings post-config file post-date)
-          post-url (get-post-url settings post-filepath)]
+          post-url (get-post-url settings post-filepath)
+          post-authors (get-post-authors settings post-config)
+          post-author (first post-authors)
+          ]
       (if (not (:draft post-config))
-        {:content post-content :date post-date :filepath post-filepath :url post-url :title post-title}))))
+        {:content post-content :date post-date :filepath post-filepath :url post-url :title post-title :author post-author :authors post-authors}))))
 
 
 
