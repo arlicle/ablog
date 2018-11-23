@@ -222,8 +222,9 @@ a.external:hover {
 
 @media screen and (max-width:767px) {
 	.post-wrapper {
+		font-size: 1rem;
 		width: 85%;
-		margin: 100px auto 50px;
+		margin: 25px auto 50px;
 		padding: 0
 	}
 }
@@ -332,13 +333,13 @@ a.external:hover {
 .post-wrapper ol li {
 	margin-bottom: 5px;
 	list-style: decimal;
-	line-height: 1.1em;
+	line-height: 170%;
 }
 
 @media screen and (max-width:767px) {
 	.post-wrapper ol li {
-		margin-bottom: 0;
-		line-height: 1em
+		margin-bottom: 15px;
+		line-height: 170%;
 	}
 }
 
@@ -578,7 +579,7 @@ li.L0,li.L1,li.L2,li.L3,li.L4,li.L5,li.L6,li.L7,li.L8,li.L9 {
 .footer {
     clear: both;
     margin-bottom:100px;
-    margin-top:100px;
+    margin-top:160px;
     text-align: center;
     font-size: 12px;
     color: #888;
