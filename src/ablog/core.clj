@@ -220,10 +220,13 @@
   [settings file]
   (if (is-valid-file settings file)
     (let [rdr (clojure.java.io/reader file)
-          post-config (read (java.io.PushbackReader. rdr))
-          post-content (if (= (type post-config) clojure.lang.PersistentArrayMap)
-            (md/md-to-html-string (clojure.string/join "\n" (line-seq (java.io.BufferedReader. rdr))))
-            (slurp file))
+          post-config (try (read (java.io.PushbackReader. rdr))
+                           (catch Exception e nil)
+                           )
+          post-content (md/md-to-html-string
+                         (if (= (type post-config) clojure.lang.PersistentArrayMap)
+                          (slurp rdr)
+                          (slurp file)))
           post-title (get-post-title post-config file)
           post-date (get-post-date settings post-config file)
           post-filepath (get-public-post-filepath settings post-config file post-date)
