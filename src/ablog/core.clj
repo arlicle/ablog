@@ -31,7 +31,8 @@
    :title       nil ; 文章标题
    :description "" ; 文章描述 可以用于站点优化
    :keywords    "" ; 文章关键词 用于站点优化
-   :date        nil ; 发布日期 或者发布日期+时间 创建日期
+   :post-date   nil ; 发布日期 或者发布日期+时间 创建日期
+   :last-modified nil                                       ; 最后修改时间
    :updated     nil ; 更新日期，最后一次修改时间
    :layout      "post" ; 对应布局，目前有两种 post page
    :slug        nil ;文章标题形成的文件名和网址，设置了，那么 post 文件名的就不管用了，方便中文的管理 "spf13-vim-3-0-release-and-new-website"
@@ -140,7 +141,7 @@
 (defn get-post-date
   "获取 post 提交时间"
   [settings post-config file]
-  (if-let [write-date (:date post-config)]
+  (if-let [write-date (:post-date post-config)]
     (time-formater write-date)
     (->> (re-find #"^([\d\-]+)-(.*?)\.md$" (.getName file))
          (second)
@@ -219,7 +220,8 @@
   "获取post的相关值"
   [settings file]
   (if (is-valid-file settings file)
-    (let [rdr (clojure.java.io/reader file)
+    (let [last-modified (.lastModified (clojure.java.io/file file))
+          rdr (clojure.java.io/reader file)
           post-config (try (read (java.io.PushbackReader. rdr))
                            (catch Exception e nil)
                            )
@@ -235,7 +237,7 @@
           post-author (first post-authors)
           ]
       (if (not (:draft post-config))
-        {:content post-content :date post-date :filepath post-filepath :url post-url :title post-title :author post-author :authors post-authors}))))
+        {:content post-content :post-date post-date :last_modified last-modified :filepath post-filepath :url post-url :title post-title :author post-author :authors post-authors}))))
 
 
 
@@ -249,7 +251,7 @@
   (->> (file-seq (clojure.java.io/file (:posts-dir settings)))
        (pmap #(parse-post settings %))
        (filter not-empty)
-       (sort-by :date)))
+       (sort-by :post-date)))
 
 
 (defn generate-html

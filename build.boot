@@ -1,5 +1,6 @@
 (set-env!
  :source-paths #{"src"}
+ :target-path #{"target"}
  :dependencies '[[adzerk/boot-cljs "2.1.4"]
                  [pandeiro/boot-http "0.8.3"]
                  [org.clojure/tools.nrepl "0.2.12"]
@@ -11,6 +12,8 @@
                  ;[seancorfield/boot-expectations "1.0.11"]
                  [metosin/bat-test "0.4.0" :scope "test"]
                  [onetom/boot-lein-generate "0.1.3" :scope "test"]
+                 [org.slf4j/slf4j-nop "1.7.13" :scope "test"]
+                 [deraen/boot-sass "0.3.1"]
                  ])
 
 
@@ -19,6 +22,7 @@
          '[ablog.core :refer [generate get-settings]]
          ;'[adzerk.boot-reload :refer [reload]]
          ;'[adzerk.boot-test :refer :all]
+         '[deraen.boot-sass :refer [sass]]
          '[metosin.bat-test :refer (bat-test)])
 
 

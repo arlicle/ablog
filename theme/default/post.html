@@ -1,71 +1,55 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="zh-CN">
   <head>
-    <meta charset="utf-8" />
-    <title>{{title}} - {{site-title}}</title>
-    <meta name="renderer" content="webkit">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
-    <link rel="stylesheet" href="/css/style.css?t=20181123">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
     <link rel="stylesheet" href="/js/prism.css">
+    <link rel="stylesheet" href="/css/app.css">
+    <title>{{title}} - {{site-title}}</title>
+    <link rel="icon" type="image/x-icon" class="js-site-favicon" href="https://assets-cdn.github.com/favicon.ico">
   </head>
-  <body class="body-post">
-  <div class="post-wrapper">
-    <h1 class="post-title">{{title}}</h1>
-    <p class="post-date">{% if authors %}{{ authors|join:" " }} {% endif %}{{ date|date:"yyy-MM-dd" }}</p>
-    {{ content|safe }}
-  </div>
+  <body style="background-color:#f5f5f5">
+        <div class="container bg-white pb-5 px-5 spx-0">
+            
+            <h1 class="post-title">{{title}}</h1>
+{% if lead %}
+            <p class="lead text-center">手头上永远要有一样产品，是天塌下来你也挣钱的</p>
+{% endif %}
+            {{ content|safe }}
+            <p class="text-left text-muted">{% if authors %}{{ authors|join:" " }} {% endif %}{{ last_modified|date:"yyy-MM-dd HH:mm" }}</p>
+        </div>
+        <div class="container">
+            <div class="row mt-4 pb-5">
+                <div class="col-6 text-left">{% if next-post %}<a href="{{ next-post.url }}">上一篇: {{ next-post.title }}</a>{% endif %}</div>
+                <div class="col-6 text-right">{% if prev-post %}<a href="{{ prev-post.url }}">下一篇: {{ prev-post.title }}</a>{% endif %}</div>
+            </div>
+        </div>
 
-  <ul class="pager">
-    {% if next-post %}
-    <li class="previous"><a href="{{ next-post.url }}">上一篇: {{ next-post.title }}</a></li>
-    {% endif %}
-    {% if prev-post %}
-    <li class="next"><a href="{{prev-post.url}}">下一篇: {{ prev-post.title }}</a></li>
-    {% endif %}
-  </ul>
-
-<div class="footer">滇ICP备10201832号-3</div>
-{#
-  <div class="about-wrapper">
-  <div class="aboutme">
-    <h2><a href="/">相关文章</a></h2>
-    <ul>
-      <li>
-        <a href="#" class="title">回车、换行、和文件末尾空行</a>
-      </li>
-      <li>
-        <a href="#" class="title">VPS环境搭建详解 (Virtualenv+Gunicorn+Supervisor+Nginx)</a>
-      </li>
-      <li>
-        <a href="#" class="title">CSS3动画详解</a>
-      </li>
-      <li>
-        <a href="#" class="title">Grunt.js 在前端项目中的实战</a>
-      </li>
-      <li>
-        <a href="#" class="title">编写可读代码的艺术</a>
-      </li>
-      <li>
-        <a href="#" class="title">宗教基本知识</a>
-      </li>
-      <li>
-        <a href="#" class="title">Git时代的VIM不完全使用教程</a>
-      </li>
-      <li>
-        <a href="#" class="title">使用Backbone.js开发Chrome便签插件</a>
-      </li>
-      <li>
-        <a href="#" class="title">如何选择与购买吉他</a>
-      </li>
-      <li>
-        <a href="#" class="title">使用Github Pages建独立博客</a>
-      </li>
-      <li>
-        <a href="#" class="title">我为什么写博客？</a>
-      </li>
-    </ul>
-  </div>
-</div>#}
-<script src="/js/prism.js"></script>
-</body>
+        <div class="container">
+            <h3>留言</h3>
+            <div id="commentApp"></div>
+        </div>
+        <footer class="footer mt-5 pb-2">
+                <div class="container text-center">
+                  <span class="text-black-50">滇ICP备10201832号-3</span>
+                </div>
+        </footer>
+        <script type="text/javascript">
+            var AL_configs = {
+                "post_id":"{{ url }}",
+                "appid":"847e226e8a46f64045d45312245a68ba1368a564"
+            };
+            </script>
+        <script src="https://comment.debugmyself.com/sc.js"></script>
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+        <script src="/js/prism.js"></script>
+        <script>
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip();
+        })
+        </script>
+  </body>
 </html>
