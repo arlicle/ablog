@@ -95,17 +95,17 @@
 (defn copy-dir
   "把文件夹拷贝到对应的目录"
   [src target ignored-files]
+  (println "src:" src)
   (doall
     (pmap #(let [filepath-str (str %)
-      file-rel-path (subs filepath-str (count src))
-      file-target-path (str target file-rel-path)]
-      (copy-file filepath-str file-target-path)) (filter #(.isFile %) (file-seq (clojure.java.io/file src))))))
+                 file-rel-path (subs filepath-str (count src))
+                 file-target-path (str target file-rel-path)]
+             (println "filepath-str:" filepath-str)
+             (copy-file filepath-str file-target-path)) (filter #(.isFile %) (file-seq (clojure.java.io/file src))))))
 
 (defn copy-resources-from-theme
   "复制模板的资源到对外的目录"
   [settings]
-  (let [theme-folder (str "theme/" (:theme settings))
-        public-folder (:public-dir settings)])
   (doall
     (map #(copy-dir (str "theme/" (:theme settings) "/" %) (str (:public-dir settings) "/" %) nil) ["css" "images" "img" "js"])))
 
