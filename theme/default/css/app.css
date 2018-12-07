@@ -42,6 +42,7 @@ img {
   left:auto;
   top:9rem;
   right:2rem;
+  display: block;
 }
 
 @media screen and (max-width:767px) {
@@ -52,6 +53,21 @@ h4, .h4 { font-size: 1rem; margin-bottom: 1rem}
 h5, .h5 { font-size: 1rem; }
 h6, .h6 { font-size: 1rem; }
 
+    
+#m-menu {
+    background: #fff;
+    flex-direction:unset!important;
+}
+
+.site-menu {
+  left:auto;
+  top:0rem;
+  right:4rem;
+}
+
+.m-menu-toggle {
+  left:auto;
+}
 
 
     .spx-0 {
