@@ -9,6 +9,25 @@ h4, .h4 { font-size: 1rem; margin-bottom: 1rem}
 h5, .h5 { font-size: 1rem; }
 h6, .h6 { font-size: 1rem; }
 
+.pl-5x, .px-5x {
+    padding-left: 5rem!important;
+}
+
+.pr-5x, .px-5x {
+    padding-right: 5rem!important;
+}
+
+.pb-5x, .py-5x {
+    padding-bottom: 5rem!important;
+}
+
+.pt-5x, .py-5x {
+    padding-top: 5rem!important;
+}
+
+.pagination a.page-link {
+    border:none;
+}
 
 .post-title {
     text-align: center!important;
@@ -17,6 +36,12 @@ h6, .h6 { font-size: 1rem; }
 
 img {
     max-width: 100%;
+}
+
+.site-menu {
+  left:auto;
+  top:9rem;
+  right:2rem;
 }
 
 @media screen and (max-width:767px) {

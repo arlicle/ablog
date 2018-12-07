@@ -6,7 +6,6 @@
             [selmer.parser :refer [render render-file]]
             ))
 
-(selmer.parser/set-resource-path! (System/getProperty "user.dir"))
 
 
 
@@ -21,7 +20,8 @@
    :theme                     "default"
    :post-date-format          "yyyy-MM-dd HH:mm"
    :post-filename-date-format "yyyyMMddHHmm"
-   :post-permalink            ":year/:month/:day/:title/"
+   :posts-out-dir             "p"
+   :post-permalink            ":year/:month/:day/:title"
    :public-keep-files         ["static"]
    })
 
@@ -58,14 +58,25 @@
   "如果只有一个 s 参数，那么只是清空空格
   如果有两个参数，则去掉后一个参数"
   ([s] (clojure.string/trimr s))
-  ([s k] (if-let [i (clojure.string/last-index-of s k)] (subs s 0 i) s)))
+  ([s k] (if-let [i (clojure.string/last-index-of s k)]
+           (if (= (subs s i) k)
+             (subs s 0 i)
+             s) s)))
 
 
 (defn ltrim
   "如果只有一个 s 参数，那么只是清空空格
   如果有两个参数，则从左边开始去掉后一个参数"
   ([s] (clojure.string/triml s))
-  ([s k] (if-let [i (clojure.string/index-of s k)] (if (= 0 i) (subs s (count k)) s))))
+  ([s k] (let [i (clojure.string/index-of s k)] (if (and i (= 0 i)) (subs s (count k)) s))))
+
+
+(defn trim
+  "如果只有一个 s 参数，那么只是清空空格
+  如果有两个参数，则去掉后一个参数"
+  ([s] (clojure.string/trim s))
+  ([s k] (ltrim (rtrim s k) k)))
+
 
 (defn delete-dir
   "Delete a directory tree."
@@ -77,6 +88,7 @@
     (.delete root-file))))
 
 (defn wipe-public-folder [public-folder keep-files]
+  ; 晴空目录
   (let [public-files (reverse (file-seq (io/file public-folder))) public-folder2 (rtrim public-folder "/") new-keep-files (map #(str public-folder2 "/" %) keep-files)]
     (doall
       (map #(let [f (str %)]
@@ -147,6 +159,8 @@
          (second)
          (time-formater))))
 
+
+
 (defn get-post-title
   "获取post标题"
   [post-config file]
@@ -190,6 +204,7 @@
       (ltrim "/")
       (#(str "/" %))))
 
+
 (defn get-post-filename
   "获取post文件名"
   [slug filename]
@@ -199,20 +214,50 @@
         (clojure.string/trim)
         (clojure.string/replace #"\s+" "-"))))
 
+
+;(defn get-public-post-filepath
+;  "获取源文件文件对应的public文件"
+;  [settings post-config file post-time]
+;  (let [a
+;        (->
+;          (str (rtrim (:public-dir settings) "/")
+;               "/"
+;               (let [f (reduce (fn [s [key val]] (let [k (clojure.string/replace s (re-pattern (str key)) (str val))]
+;                                                   (println "ssss:" k)
+;                                                   k
+;
+;                                                   ))
+;                               (:post-permalink settings)
+;                               {:year  (str (clj-time-core/year post-time))
+;                                :month (str (clj-time-core/month post-time))
+;                                :day   (str (clj-time-core/day post-time))
+;                                :title (get-post-filename (:slug post-config) (get-filename file))})]
+;                 (rtrim f "/"))
+;               "/index.html"))]
+;    (println "a:" a)
+;    a
+;    ))
+
+
 (defn get-public-post-filepath
   "获取源文件文件对应的public文件"
   [settings post-config file post-time]
-  (->
-    (str (rtrim (:public-dir settings) "/")
-         "/"
-         (let [f (reduce (fn [s [key val]] (clojure.string/replace s (re-pattern (str key)) (str val)))
-                         (:post-permalink settings)
-                         {:year (str (clj-time-core/year post-time))
-                          :month (str (clj-time-core/month post-time))
-                          :day (str (clj-time-core/day post-time))
-                          :title (get-post-filename (:slug post-config) (get-filename file))})]
-           (rtrim f "/"))
-         "/index.html")))
+
+  (str (rtrim (:public-dir settings) "/")
+       "/"
+       (trim (:posts-out-dir settings) "/")
+       "/"
+       (let [f (reduce (fn [s [key val]] (clojure.string/replace s (re-pattern (str key)) (str val)))
+                       (:post-permalink settings)
+                       {:year  (str (clj-time-core/year post-time))
+                        :month (str (clj-time-core/month post-time))
+                        :day   (str (clj-time-core/day post-time))
+                        :title (get-post-filename (:slug post-config) (get-filename file))})]
+         (trim f "/"))
+       "/index.html")
+  )
+
+
 
 
 
@@ -251,16 +296,37 @@
   (->> (file-seq (clojure.java.io/file (:posts-dir settings)))
        (pmap #(parse-post settings %))
        (filter not-empty)
-       (sort-by :post-date)))
+       (sort #(compare (:post-date %2) (:post-date %1)))))
 
 
-(defn generate-html
+
+
+(defn generate-post-list
+  "生成post列表页"
+  [settings [current-page posts] pages template_filename]
+  (let [prev-page (if (= current-page 1) current-page (dec current-page))
+        next-page (if (= current-page (count pages)) current-page (inc current-page))
+        list-html (render-file template_filename {:posts posts :prev-page prev-page :current-page current-page :pages pages :next-page next-page :total-page-count (count pages) :site-title (:site-title settings)})
+        page-link (if (> current-page 1) ; 如果第一页，那么就直接/list/
+                    (str "/list/page/" current-page)
+                    "/list/"
+                    )
+        list-filepath (str (rtrim (:public-dir settings) "/") "/" (:posts-out-dir settings) page-link "/index.html")
+        ]
+    (clojure.java.io/make-parents list-filepath)
+    (spit list-filepath list-html)
+    ))
+
+
+
+
+(defn generate-post
   "为相应的模板生成页面"
   [settings [prev-post post next-post] template_filename]
   (let [new-post (assoc post :prev-post prev-post :next-post next-post :site-title (:site-title settings))
-        post-html (render-file (str "theme/" (:theme settings) "/" template_filename) new-post)]
+        post-html (render-file template_filename new-post)]
     (clojure.java.io/make-parents (:filepath post))
-    (println "create : " (:filepath post))
+    (println "post-path:" (:filepath post))
     (spit (:filepath post) post-html)))
 
 
@@ -268,7 +334,7 @@
 (defn generate-homepage
   "生成首页"
   [settings [prev-post post next-post]]
-  (generate-html settings [prev-post (assoc post :filepath (str (rtrim (:public-dir settings) "/") "/index.html")) next-post] "post.html"))
+  (generate-post settings [prev-post (assoc post :filepath (str (rtrim (:public-dir settings) "/") "/index.html")) next-post] "post.html"))
 
 
 
@@ -276,12 +342,31 @@
   "整站生成静态网站"
   []
   (let [settings (get-settings)
-        post-part-list (partition 3 1 (lazy-cat [nil] (get-posts-list settings) [nil]))]
+        _ (selmer.parser/set-resource-path! (str (System/getProperty "user.dir") "/theme/" (:theme settings)))
+        posts (get-posts-list settings)
+        ; 博客一页一页的
+        post-part-list (partition 3 1 (lazy-cat [nil] posts [nil]))
+        ; 列表分页
+        post-list-list (map #(vector (inc %1) %2) (range) (partition-all 15 posts))
+        ; 页数
+        page-count (count post-list-list)
+        pages (range 1 (inc page-count))
+        ]
+    ; 清空目录
     (wipe-public-folder (:public-dir settings) (:public-keep-files settings))
-    (generate-homepage settings (last post-part-list))
+    ; 生成首页
+    (generate-homepage settings (first post-part-list))
+    ; 复制皮肤相关资源到目标目录
     (copy-resources-from-theme settings)
+
+    ; 生成所有文章列表页
     (doall
-      (pmap #(generate-html settings % "post.html") post-part-list))))
+      (pmap #(generate-post-list settings % pages "list.html") post-list-list))
+
+
+    (doall
+      ; 生成每一个post
+      (pmap #(generate-post settings % "post.html") post-part-list))))
 
 
 
