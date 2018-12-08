@@ -1,0 +1,24 @@
+{% include "head.html" %}
+        <div class="container bg-white pb-5 px-5 spx-0">
+            
+            <h1 class="post-title">{{title}}</h1>
+{% if lead %}
+            <p class="lead text-center">手头上永远要有一样产品，是天塌下来你也挣钱的</p>
+{% endif %}
+            {{ content|safe }}
+            <p class="text-left text-muted">{% if authors %}{{ authors|join:" " }} {% endif %}{{ last_modified|date:"yyy-MM-dd HH:mm" }}</p>
+        </div>
+{% include "foot.html" %}
+{% block footer %}
+    <div class="container">
+        <h3>留言</h3>
+        <div id="commentApp"></div>
+    </div>
+    <script type="text/javascript">
+        var AL_configs = {
+            "post_id":"{{ url }}",
+            "appid":"847e226e8a46f64045d45312245a68ba1368a564"
+        };
+        </script>
+    <script src="https://comment.debugmyself.com/sc.js"></script>
+{% endblock %}

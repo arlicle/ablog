@@ -22,7 +22,7 @@
    :post-filename-date-format "yyyyMMddHHmm"
    :posts-out-dir             "p"
    :post-permalink            ":year/:month/:day/:title"
-   :public-keep-files         ["static"]
+   :public-keep-files         ["static" "pages" "posts" "CNAME" ".git"]
    })
 
 ; 默认post参数
@@ -77,6 +77,12 @@
   ([s] (clojure.string/trim s))
   ([s k] (ltrim (rtrim s k) k)))
 
+
+
+(defn is-theme-exists
+  [settings f]
+  (.exists (io/as-file (str "theme/" (:theme settings) "/" f)))
+  )
 
 (defn delete-dir
   "Delete a directory tree."
@@ -215,32 +221,10 @@
         (clojure.string/replace #"\s+" "-"))))
 
 
-;(defn get-public-post-filepath
-;  "获取源文件文件对应的public文件"
-;  [settings post-config file post-time]
-;  (let [a
-;        (->
-;          (str (rtrim (:public-dir settings) "/")
-;               "/"
-;               (let [f (reduce (fn [s [key val]] (let [k (clojure.string/replace s (re-pattern (str key)) (str val))]
-;                                                   (println "ssss:" k)
-;                                                   k
-;
-;                                                   ))
-;                               (:post-permalink settings)
-;                               {:year  (str (clj-time-core/year post-time))
-;                                :month (str (clj-time-core/month post-time))
-;                                :day   (str (clj-time-core/day post-time))
-;                                :title (get-post-filename (:slug post-config) (get-filename file))})]
-;                 (rtrim f "/"))
-;               "/index.html"))]
-;    (println "a:" a)
-;    a
-;    ))
 
 
 (defn get-public-post-filepath
-  "获取源文件文件对应的public文件"
+  "获取源文件post文件对应的public文件"
   [settings post-config file post-time]
 
   (str (rtrim (:public-dir settings) "/")
@@ -258,31 +242,49 @@
   )
 
 
+(defn get-public-page-filepath
+  "获取源文件page文件对应的public文件"
+  [settings post-config file post-time]
 
+  (str (rtrim (:public-dir settings) "/")
+       "/"
+       (trim (:page-out-dir settings) "/")
+       "/"
+       (let [f (reduce (fn [s [key val]] (clojure.string/replace s (re-pattern (str key)) (str val)))
+                       (:page-permalink settings)
+                       {:year  (str (clj-time-core/year post-time))
+                        :month (str (clj-time-core/month post-time))
+                        :day   (str (clj-time-core/day post-time))
+                        :title (get-post-filename (:slug post-config) (get-filename file))})]
+         (trim f "/"))
+       "/index.html")
+  )
 
 
 (defn parse-post
   "获取post的相关值"
-  [settings file]
-  (if (is-valid-file settings file)
-    (let [last-modified (.lastModified (clojure.java.io/file file))
-          rdr (clojure.java.io/reader file)
-          post-config (try (read (java.io.PushbackReader. rdr))
-                           (catch Exception e nil)
-                           )
-          post-content (md/md-to-html-string
-                         (if (= (type post-config) clojure.lang.PersistentArrayMap)
-                          (slurp rdr)
-                          (slurp file)))
-          post-title (get-post-title post-config file)
-          post-date (get-post-date settings post-config file)
-          post-filepath (get-public-post-filepath settings post-config file post-date)
-          post-url (get-post-url settings post-filepath)
-          post-authors (get-post-authors settings post-config)
-          post-author (first post-authors)
-          ]
-      (if (not (:draft post-config))
-        {:content post-content :post-date post-date :last_modified last-modified :filepath post-filepath :url post-url :title post-title :author post-author :authors post-authors}))))
+  ([settings file] (parse-post settings file "post"))
+  ([settings file ftype]
+   (if (is-valid-file settings file)
+     (let [last-modified (.lastModified (clojure.java.io/file file))
+           rdr (clojure.java.io/reader file)
+           post-config (try (read (java.io.PushbackReader. rdr))
+                            (catch Exception e nil)
+                            )
+           post-content (md/md-to-html-string
+                          (if (= (type post-config) clojure.lang.PersistentArrayMap)
+                            (slurp rdr)
+                            (slurp file)))
+           post-filename (get-filename file)
+           post-title (get-post-title post-config file)
+           post-date (get-post-date settings post-config file)
+           post-filepath (if (= ftype "page") (get-public-page-filepath settings post-config file post-date) (get-public-post-filepath settings post-config file post-date))
+           post-url (get-post-url settings post-filepath)
+           post-authors (get-post-authors settings post-config)
+           post-author (first post-authors)
+           ]
+       (if (not (:draft post-config))
+         {:content post-content :post-date post-date :last_modified last-modified :filename post-filename :filepath post-filepath :url post-url :title post-title :author post-author :authors post-authors})))))
 
 
 
@@ -300,24 +302,64 @@
 
 
 
+(defn get-page-list
+  "获取所有的page文件列表，返回的是：
+  文章内容
+  文章标题
+  文章时间
+  其它变量的一个map组成的列表"
+  [settings]
+  (->> (file-seq (clojure.java.io/file (:page-dir settings)))
+       (pmap #(parse-post settings % "page"))
+       (filter not-empty)
+       (sort #(compare (:post-date %2) (:post-date %1)))))
+
 
 (defn generate-post-list
   "生成post列表页"
-  [settings [current-page posts] pages template_filename]
-  (let [prev-page (if (= current-page 1) current-page (dec current-page))
-        next-page (if (= current-page (count pages)) current-page (inc current-page))
-        list-html (render-file template_filename {:posts posts :prev-page prev-page :current-page current-page :pages pages :next-page next-page :total-page-count (count pages) :site-title (:site-title settings)})
-        page-link (if (> current-page 1) ; 如果第一页，那么就直接/list/
-                    (str "/list/page/" current-page)
-                    "/list/"
-                    )
-        list-filepath (str (rtrim (:public-dir settings) "/") "/" (:posts-out-dir settings) page-link "/index.html")
-        ]
-    (clojure.java.io/make-parents list-filepath)
-    (spit list-filepath list-html)
-    ))
+  [settings [current-page posts] page-numbers template_filename]
+  (if (is-theme-exists settings template_filename)
+    (let [prev-page (if (= current-page 1) current-page (dec current-page))
+          next-page (if (= current-page (count page-numbers)) current-page (inc current-page))
+          list-html (render-file template_filename {:posts posts :prev-page prev-page :current-page current-page :page-numbers page-numbers :next-page next-page :total-page-count (count page-numbers) :site-title (:site-title settings)})
+          page-link (if (> current-page 1)                  ; 如果第一页，那么就直接/list/
+                      (str "/list/page/" current-page)
+                      "/list"
+                      )
+          list-filepath (str (rtrim (:public-dir settings) "/") "/" (:posts-out-dir settings) page-link "/index.html")
+          ]
+      (println "list:" list-filepath)
+      (clojure.java.io/make-parents list-filepath)
+      (spit list-filepath list-html)
+      )))
 
 
+(defn generate-readme
+  "生成README.md"
+  [settings posts template_filename]
+  (if (is-theme-exists settings template_filename)
+    (let [html-data (render-file template_filename {:posts posts :total-post-count (count posts) :site-title (:site-title settings)})
+          list-filepath (str (rtrim (:public-dir settings) "/") "/" template_filename)
+          ]
+      (clojure.java.io/make-parents list-filepath)
+      (spit list-filepath html-data)
+      )))
+
+
+
+(defn generate-page
+  "生成page页"
+  [settings [prev-page page next-page] pages template_filename]
+  (println "is-theme-exsits:" (is-theme-exists settings template_filename))
+  (if (is-theme-exists settings template_filename)
+    (let [
+          html-data (render-file template_filename (assoc page :prev-page prev-page :next-page next-page :site-title (:site-title settings) :total-page-count (count pages)))
+          filepath (str (rtrim (:public-dir settings) "/") "/" (:posts-out-dir settings) "/" (:filename page) "/index.html")
+          ]
+      (println "page:" filepath)
+      (clojure.java.io/make-parents filepath)
+      (spit filepath html-data)
+      )))
 
 
 (defn generate-post
@@ -338,19 +380,22 @@
 
 
 
+
 (defn generate
   "整站生成静态网站"
   []
   (let [settings (get-settings)
         _ (selmer.parser/set-resource-path! (str (System/getProperty "user.dir") "/theme/" (:theme settings)))
         posts (get-posts-list settings)
+        pages (get-page-list settings)
         ; 博客一页一页的
         post-part-list (partition 3 1 (lazy-cat [nil] posts [nil]))
+        page-part-list (partition 3 1 (lazy-cat [nil] pages [nil]))
         ; 列表分页
         post-list-list (map #(vector (inc %1) %2) (range) (partition-all 15 posts))
         ; 页数
         page-count (count post-list-list)
-        pages (range 1 (inc page-count))
+        page-numbers (range 1 (inc page-count))
         ]
     ; 清空目录
     (wipe-public-folder (:public-dir settings) (:public-keep-files settings))
@@ -359,14 +404,24 @@
     ; 复制皮肤相关资源到目标目录
     (copy-resources-from-theme settings)
 
-    ; 生成所有文章列表页
-    (doall
-      (pmap #(generate-post-list settings % pages "list.html") post-list-list))
 
 
     (doall
       ; 生成每一个post
-      (pmap #(generate-post settings % "post.html") post-part-list))))
+      (pmap #(generate-post settings % "post.html") post-part-list))
+
+    (doall
+      ; 生成pages
+      (pmap #(generate-page settings % pages "page.html") page-part-list))
+    
+    (doall
+      ; 生成所有文章列表页
+      (pmap #(generate-post-list settings % page-numbers "list.html") post-list-list))
+
+
+    ; 生成readme
+    (generate-readme settings posts "README.MD")
+    ))
 
 
 
