@@ -310,10 +310,12 @@
   文章时间
   其它变量的一个map组成的列表"
   [settings]
-  (->> (file-seq (clojure.java.io/file (:page-dir settings)))
-       (pmap #(parse-post settings % "page"))
-       (filter not-empty)
-       (sort #(compare (:post-date %2) (:post-date %1)))))
+  (println "page: get-page-list")
+  (if (.exists (io/as-file (:page-dir settings)))
+    (->> (file-seq (clojure.java.io/file (:page-dir settings)))
+         (pmap #(parse-post settings % "page"))
+         (filter not-empty)
+         (sort #(compare (:post-date %2) (:post-date %1))))))
 
 
 (defn generate-post-list
@@ -389,6 +391,7 @@
         _ (selmer.parser/set-resource-path! (str (System/getProperty "user.dir") "/theme/" (:theme settings)))
         posts (get-posts-list settings)
         pages (get-page-list settings)
+
         ; 博客一页一页的
         post-part-list (partition 3 1 (lazy-cat [nil] posts [nil]))
         page-part-list (partition 3 1 (lazy-cat [nil] pages [nil]))
@@ -410,18 +413,20 @@
     (doall
       ; 生成每一个post
       (pmap #(generate-post settings % "post.html") post-part-list))
-
-    (doall
-      ; 生成pages
-      (pmap #(generate-page settings % pages "page.html") page-part-list))
-
-    (doall
-      ; 生成所有文章列表页
-      (pmap #(generate-post-list settings % page-numbers "list.html") post-list-list))
+    ;
+    ;(if (seq page-part-list)
+    ;  (doall
+    ;    ; 生成pages
+    ;    (map #(generate-page settings % pages "page.html") page-part-list)))
+    ;
+    ;
+    ;(doall
+    ;  ; 生成所有文章列表页
+    ;  (map #(generate-post-list settings % page-numbers "list.html") post-list-list))
 
 
     ; 生成readme
-    (generate-readme settings posts "README.MD")
+    ;(generate-readme settings posts "README.MD")
     ))
 
 

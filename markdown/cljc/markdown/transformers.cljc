@@ -390,8 +390,12 @@
    empty-line
    inhibit
    escape-inhibit-separator
+
+
    ;raw
    ;inline-raw
+
+
    code
    codeblock
    escaped-chars
@@ -409,16 +413,23 @@
    li
    heading
    blockquote-2
+
+
    ;italics
+
    bold-italic
    em
    strong
    bold
    strikethrough
+
    ;superscript
+
    table
    paragraph
    br
    thaw-strings
    dashes
-   clear-line-state])
+   clear-line-state
+
+   ])

@@ -19,12 +19,15 @@
        (seq ">"))
      text (seq "</a>") state)))
 
-(defn img [alt url state & [title]]
+(defn img [alt url state & [attrs]]
   (freeze-string
     (seq "<img src=\"") url (seq "\" alt=\"") alt
-    (if (not-empty title)
-      (seq (apply str "\" title=" (string/join title) " />"))
-      (seq "\" />"))
+    (seq (str "\""
+              (if (= (type attrs) clojure.lang.PersistentArrayMap)
+                (reduce (fn [s [k v]] (str s " " (name k) "=\"" v "\"")) "" attrs)
+                attrs
+                ) " />"))
+
     state))
 
 (defn handle-img-link [xs state]
@@ -73,9 +76,13 @@
                 (and img? (= (last head) \!))
                 (let [alt (rest title)
                       [url title] (split-with (partial not= \space) (rest link))
-                      title (process-link-title (string/join (rest title)) loop-state)
+                      attrs
+                      (try
+                        (read-string (process-link-title (string/join (rest title)) loop-state))
+                        (catch Exception e {})
+                        )
                       ;; Now process / generate the img data
-                      [img-text new-loop-state] (img alt url loop-state title)]
+                      [img-text new-loop-state] (img alt url loop-state attrs)]
                   (recur (concat out (butlast head) img-text) (rest tail) new-loop-state))
                 :else [(string/join (concat out tokens)) loop-state]))))))))
 

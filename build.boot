@@ -73,7 +73,8 @@
         public-dir (:public-dir settings)
         posts-dir (:posts-dir settings)
         page-dir (:page-dir settings)]
-  (set-env! :source-paths #{posts-dir page-dir})
+  ;(set-env! :source-paths #{posts-dir page-dir})
+  (set-env! :source-paths #{posts-dir})
   (comp
     (serve :dir public-dir :port 3006)
     (watch)

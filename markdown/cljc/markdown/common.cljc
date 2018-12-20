@@ -60,7 +60,7 @@
   [(if (or (:code state) (:codeblock state))
      text
      (-> text
-         (string/replace #"\\\\" "&#92;")
+         ;(string/replace #"\\\\" "&#92;")
          (string/replace #"\\`" "&#8216;")
          (string/replace #"\\\*" "&#42;")
          (string/replace #"\\_" "&#95;")
