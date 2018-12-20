@@ -1,3 +1,16 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <link rel="stylesheet" href="/js/prism.css">
+    <link rel="stylesheet" href="/css/app.css">
+    <title>{% block page-title %}{{title}} - {{site-title}}{% endblock %}</title>
+    <link rel="icon" type="image/x-icon" class="js-site-favicon" href="/img/favicon.ico">
+  </head>
+  <body>
+{% block page-content %}{% endblock %}
         <button class="btn btn-link m-menu-toggle d-md-none fixed-top collapsed" type="button" data-toggle="collapse" data-target="#m-menu" aria-controls="m-menu" aria-expanded="false" aria-label="Toggle docs navigation"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30" width="30" height="30" focusable="false"><title>Menu</title><path stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-miterlimit="10" d="M4 7h22M4 15h22M4 23h22"></path></svg>
         </button>
         <ul class="nav flex-column collapse fixed-top site-menu d-md-block" id="m-menu">
@@ -26,6 +39,12 @@
         $(function () {
             $('[data-toggle="tooltip"]').tooltip();
         })
+        </script>
+        <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+        </script>
+        <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_SVG" async>
         </script>
   </body>
 </html>

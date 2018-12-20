@@ -274,7 +274,8 @@
            post-content (md/md-to-html-string
                           (if (= (type post-config) clojure.lang.PersistentArrayMap)
                             (slurp rdr)
-                            (slurp file)))
+                            (slurp file))
+                          )
            post-filename (get-filename file)
            post-title (get-post-title post-config file)
            post-date (get-post-date settings post-config file)
@@ -413,7 +414,7 @@
     (doall
       ; 生成pages
       (pmap #(generate-page settings % pages "page.html") page-part-list))
-    
+
     (doall
       ; 生成所有文章列表页
       (pmap #(generate-post-list settings % page-numbers "list.html") post-list-list))

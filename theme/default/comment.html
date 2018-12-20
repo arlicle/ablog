@@ -1,0 +1,16 @@
+    <div class="container mt-5">
+        <h3>留言</h3>
+        <div id="commentApp"></div>
+    </div>
+    <script>
+        var AL_configs = {
+            "post_id":"{{ url }}",
+            "appid":"847e226e8a46f64045d45312245a68ba1368a564"
+        };
+        (function() {
+            var hm = document.createElement("script");
+            hm.src = "https://comment.debugmyself.com/sc.js";
+            var s = document.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(hm, s);
+        })();
+    </script>

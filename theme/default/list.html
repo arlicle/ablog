@@ -1,7 +1,8 @@
-{% include "head.html" %}
-        <div class="container bg-white py-5x px-5x spx-0">
+{% extends "base.html" %}
+{% block page-content %}
+        <div class="container bg-white pb-5 px-5x spx-0">
 
-            <h1 class="text-center pb-4">互联网的世界里，我有一个大大的梦想</h1>
+            <h1 class="text-center post-title">永远保持初学者的心</h1>
             {% for post in posts %}
             <p><a href="{{ post.url }}">{{ post.title }}</a></p>
             {% endfor %}
@@ -20,4 +21,4 @@
           </ul>
 
         </div>
-{% include "foot.html" %}
+{% endblock %}

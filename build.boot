@@ -1,11 +1,11 @@
 (set-env!
- :source-paths #{"src"}
+ :source-paths #{"src" "markdown/clj" "markdown/cljc"}
  :target-path #{"target"}
  :dependencies '[[adzerk/boot-cljs "2.1.4"]
                  [pandeiro/boot-http "0.8.3"]
                  [org.clojure/tools.nrepl "0.2.12"]
                  ;[adzerk/boot-reload "0.5.2"]
-                 [markdown-clj "1.0.2"]
+                 ;[markdown-clj "1.0.5"]
                  [clj-time "0.14.2"]
                  [selmer "1.11.7"]
                  ;[adzerk/boot-test "1.2.0"]
@@ -71,8 +71,9 @@
   []
   (let [settings (get-settings)
         public-dir (:public-dir settings)
-        posts-dir (:posts-dir settings)]
-  (set-env! :source-paths #{posts-dir})
+        posts-dir (:posts-dir settings)
+        page-dir (:page-dir settings)]
+  (set-env! :source-paths #{posts-dir page-dir})
   (comp
     (serve :dir public-dir :port 3006)
     (watch)
