@@ -34,7 +34,7 @@
        (map tmp-path)))
 
 
-(deftask watch-generate
+(deftask watch-generate-public
   []
   (let [tmp-result (tmp-dir!)
         compilers  (atom {})
@@ -45,14 +45,31 @@
       (with-pre-wrap fileset
         (let [diff          (fileset-diff @prev fileset)
               macro-changes (macro-files-changed diff)])
-        (generate)
+        (generate "pub")
         (reset! prev fileset)
         (-> fileset commit!)))))
+
+
+(deftask watch-generate-local
+         []
+         (let [tmp-result (tmp-dir!)
+               compilers  (atom {})
+               prev       (atom nil)
+               prev-deps  (atom (get-env :dependencies))
+               settings (get-settings)]
+           (comp
+             (with-pre-wrap fileset
+                            (let [diff          (fileset-diff @prev fileset)
+                                  macro-changes (macro-files-changed diff)])
+                            (generate "dev")
+                            (reset! prev fileset)
+                            (-> fileset commit!)))))
+
 
 (deftask parse
   "generate html"
   []
-(generate))
+(generate "pub"))
 
 (deftask build
   "Builds an uberjar of this project that can be run with java -jar"
@@ -65,21 +82,41 @@
    (target)))
 
 
-
 (deftask dev
-  "run the blog server"
+         "run the blog server"
+         []
+
+         (let [settings (get-settings)
+               public-dir (:public-dir settings)
+               other-paths [(:posts-dir settings) (:pages-dir settings) (:private-posts-dir settings)]
+               src-paths #{"src" "markdown/clj" "markdown/cljc"}
+               ]
+           (set-env! :source-paths (reduce (fn [s k] (if k (conj s k) s)) src-paths other-paths))
+           (comp
+             (serve :dir public-dir :port 3006)
+             (watch)
+             ;(reload)
+             (watch-generate-local)
+             ;(cljs :compiler-options {:output-to "main.js"})
+             ;(target :dir #{(str public-dir "js/")})
+             )))
+
+
+(deftask pub
+  "run the blog with private server"
   []
   (let [settings (get-settings)
         public-dir (:public-dir settings)
         posts-dir (:posts-dir settings)
-        page-dir (:page-dir settings)]
-  ;(set-env! :source-paths #{posts-dir page-dir})
-  (set-env! :source-paths #{posts-dir})
+        pages-dir (:pages-dir settings)
+        private-posts-dir (:private-posts-dir settings)
+        ]
+  (set-env! :source-paths #{posts-dir pages-dir private-posts-dir})
   (comp
     (serve :dir public-dir :port 3006)
     (watch)
     ;(reload)
-    (watch-generate)
+    (watch-generate-public)
     ;(cljs :compiler-options {:output-to "main.js"})
     ;(target :dir #{(str public-dir "js/")})
 )))

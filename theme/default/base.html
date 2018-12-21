@@ -18,10 +18,10 @@
                 <a class="nav-link" href="/">首页</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="/p/list/">所有文章</a>
+                <a class="nav-link" href="/{{ posts-out-dir }}/list/">所有文章</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="/p/about-me/">关于我</a>
+                <a class="nav-link" href="/{{ posts-out-dir }}/about-me/">关于我</a>
             </li>
         </ul>
 
@@ -41,7 +41,7 @@
         })
         </script>
         <script type="text/x-mathjax-config">
-        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}, displayAlign: "left",scale: 180});
         </script>
         <script type="text/javascript" async
         src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_SVG" async>

@@ -46,11 +46,19 @@ img {
   display: block;
 }
 
+.MathJax_SVG svg{
+    font-size: 1.2em;
+}
+
+.MathJax_SVG_Display .MathJax_SVG svg{
+    font-size: 2em;
+}
 
 blockquote {
     padding: 1.25rem;
     margin-top: 1.25rem;
     margin-bottom: 1.25rem;
+    border: 1px solid #eee;
     border-left-width: .25rem;
     border-radius: .25rem;
     background:#f7f7f9;
