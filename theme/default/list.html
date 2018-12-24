@@ -10,13 +10,13 @@
 
             <ul class="pagination mt-5 justify-content-center">
                 <li class="page-item{% if 1 = current-page %} disabled{% endif %}">
-                  <a class="page-link" href="/p/list/{% if prev-page > 1 %}page/{{ prev-page }}/{% endif %}" tabindex="-1">Previous</a>
+                  <a class="page-link" href="/{{ posts-out-dir }}/list/{% if prev-page > 1 %}page/{{ prev-page }}/{% endif %}" tabindex="-1">Previous</a>
                 </li>
                 {% for page in page-numbers %}
-                <li class="page-item{% if page = current-page %} active{% endif %}"><a class="page-link" href="/p/list/{% if page > 1 %}page/{{ page }}/{% endif %}">{{ page }}</a></li>
+                <li class="page-item{% if page = current-page %} active{% endif %}"><a class="page-link" href="/{{ posts-out-dir }}/list/{% if page > 1 %}page/{{ page }}/{% endif %}">{{ page }}</a></li>
                 {% endfor %}
                 <li class="page-item{% if total-page-count = current-page %} disabled{% endif %}">
-                  <a class="page-link" href="/p/list/page/{{ next-page }}/">Next</a>
+                  <a class="page-link" href="/{{ posts-out-dir }}/list/page/{{ next-page }}/">Next</a>
                 </li>
           </ul>
 
