@@ -49,6 +49,11 @@
 
 ; 公共映射目录
 (def *posts-out-dir (atom (:posts-out-dir default-settings)))
+; post 分类
+(def *post-categories (atom {}))
+; post 标签
+(def *post-tags (atom {}))
+
 
 
 ; 获取网站参数
@@ -214,6 +219,17 @@
       (#(str "/" %))))
 
 
+(defn get-category-url
+  [settings category-name]
+  (str "/" @*posts-out-dir "/cat/" category-name)
+  )
+
+
+(defn get-tag-url
+  [settings tag-name]
+  (str "/" @*posts-out-dir "/tag/" tag-name)
+  )
+
 (defn get-post-filename
   "获取post文件名"
   [slug filename]
@@ -273,6 +289,11 @@
            post-config (try (read (java.io.PushbackReader. rdr))
                             (catch Exception e nil)
                             )
+           categories (:categories post-config)
+
+           categories2 (for [x categories] {:name x :url (get-category-url settings x)})
+           tags (:tags post-config)
+           tags2 (for [x tags] {:name x :url (get-tag-url settings x)})
            post-content (md/md-to-html-string
                           (if (= (type post-config) clojure.lang.PersistentArrayMap)
                             (slurp rdr)
@@ -285,9 +306,26 @@
            post-url (get-post-url settings post-filepath)
            post-authors (get-post-authors settings post-config)
            post-author (first post-authors)
+
+           post {:content post-content :post-date post-date :last_modified last-modified :filename post-filename :filepath post-filepath :url post-url :title post-title :author post-author :authors post-authors :categories categories2 :tags tags2}
            ]
+
+       (doseq [x categories]
+         (if x
+           (swap! *post-categories update-in [x] conj post)
+           )
+         )
+
+       (doseq [x tags]
+         (if x
+           (swap! *post-tags update-in [x] conj post)
+           )
+         )
+
+
        (if (not (:draft post-config))
-         {:content post-content :post-date post-date :last_modified last-modified :filename post-filename :filepath post-filepath :url post-url :title post-title :author post-author :authors post-authors})))))
+         post
+         )))))
 
 
 
@@ -301,7 +339,6 @@
   (->> (file-seq (clojure.java.io/file (folder-key settings)))
        (pmap #(parse-post settings %))
        (filter not-empty)
-       ;(sort #(compare (:post-date %2) (:post-date %1)))
        ))
 
 
@@ -330,6 +367,23 @@
           page-link (if (> current-page 1)                  ; 如果第一页，那么就直接/list/
                       (str "/list/page/" current-page)
                       "/list"
+                      )
+          list-filepath (str (rtrim (:public-dir settings) "/") "/" @*posts-out-dir page-link "/index.html")
+          ]
+      (clojure.java.io/make-parents list-filepath)
+      (spit list-filepath list-html)
+      )))
+
+(defn generate-cat-post-list
+  "生成category列表页"
+  [settings [current-page posts] page-numbers template_filename]
+  (if (is-theme-exists settings template_filename)
+    (let [prev-page (if (= current-page 1) current-page (dec current-page))
+          next-page (if (= current-page (count page-numbers)) current-page (inc current-page))
+          list-html (render-file template_filename {:posts posts :prev-page prev-page :current-page current-page :page-numbers page-numbers :next-page next-page :total-page-count (count page-numbers) :site-title (:site-title settings) :posts-out-dir @*posts-out-dir})
+          page-link (if (> current-page 1)                  ; 如果第一页，那么就直接/list/
+                      (str "/cat/" current-page)
+                      "/cat"
                       )
           list-filepath (str (rtrim (:public-dir settings) "/") "/" @*posts-out-dir page-link "/index.html")
           ]
@@ -368,7 +422,7 @@
 (defn generate-post
   "为相应的模板生成页面"
   [settings [prev-post post next-post] template_filename]
-  (let [new-post (assoc post :prev-post prev-post :next-post next-post :site-title (:site-title settings) :posts-out-dir @*posts-out-dir)
+  (let [new-post (assoc post :prev-post prev-post :next-post next-post :site-title (:site-title settings) :posts-out-dir @*posts-out-dir :all-tags @*post-tags :all-categories @*post-categories)
         post-html (render-file template_filename new-post)]
     (clojure.java.io/make-parents (:filepath post))
     (println "post-path:" (:filepath post))
@@ -413,6 +467,7 @@
         page-part-list (partition 3 1 (lazy-cat [nil] pages [nil]))
         ; 列表分页
         post-list-list (map #(vector (inc %1) %2) (range) (partition-all 15 posts))
+
         ; 页数
         page-count (count post-list-list)
         page-numbers (range 1 (inc page-count))
@@ -427,7 +482,7 @@
 
     (doall
       ; 生成每一个post
-      (map #(generate-post settings % "post.html") post-part-list))
+      (pmap #(generate-post settings % "post.html") post-part-list))
 
     (if (seq page-part-list)
       (doall
@@ -440,7 +495,21 @@
 
     ; 生成readme
     (generate-readme settings posts "README.MD")
-    ))
+
+
+    ; 生成分类页
+    (doseq [[cat_name posts] @*post-categories]
+      (let [cat-part-posts (map #(vector (inc %1) %2) (range) (partition-all 15 posts))]
+        (doall
+          ; 生成所有分类列表页
+          (pmap #(generate-cat-post-list settings % page-numbers "list.html") post-list-list))
+        )
+      )
+
+
+    ; 生成标签页
+    )
+  )
 
 
 
