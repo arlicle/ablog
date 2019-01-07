@@ -64,6 +64,17 @@ blockquote {
     background:#f7f7f9;
 }
 
+table {
+    border: 1px solid #dee2e6;
+    margin-bottom: 1rem;
+}
+
+
+table td, table th {
+    padding: .75rem;
+    vertical-align: top;
+    border: 1px solid #dee2e6;
+}
 
 @media screen and (max-width:767px) {
 h1, .h1 { font-size: 1.5rem; margin-bottom: 1.5rem}

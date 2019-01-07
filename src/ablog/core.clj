@@ -89,7 +89,6 @@
   ([s k] (ltrim (rtrim s k) k)))
 
 
-
 (defn is-theme-exists
   [settings f]
   (.exists (io/as-file (str "theme/" (:theme settings) "/" f)))
