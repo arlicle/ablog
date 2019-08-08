@@ -3,6 +3,7 @@
             [clojure.java.io :as io]
             [clj-time.format :as clj-time-format]
             [clj-time.core :as clj-time-core]
+            [clj-time.coerce :as clj-time-coerce]
             [selmer.parser :refer [render render-file]]
 
             ))
@@ -15,7 +16,7 @@
   {
    :site-title                "a git blog"
    :posts-dir                 "posts"
-   :pages-dir                  "pages"
+   :pages-dir                 "pages"
    :public-dir                "public"
    :valid-filename-ext        #{"md" "html" "gdb"}
    :theme                     "default"
@@ -29,20 +30,20 @@
 ; 默认post参数
 (def default-post-settings
   {
-   :title       nil ; 文章标题
-   :description "" ; 文章描述 可以用于站点优化
-   :keywords    "" ; 文章关键词 用于站点优化
-   :post-date   nil ; 发布日期 或者发布日期+时间 创建日期
+   :title         nil                                       ; 文章标题
+   :description   ""                                        ; 文章描述 可以用于站点优化
+   :keywords      ""                                        ; 文章关键词 用于站点优化
+   :post-date     nil                                       ; 发布日期 或者发布日期+时间 创建日期
    :last-modified nil                                       ; 最后修改时间
-   :updated     nil ; 更新日期，最后一次修改时间
-   :layout      "post" ; 对应布局，目前有两种 post page
-   :slug        nil ;文章标题形成的文件名和网址，设置了，那么 post 文件名的就不管用了，方便中文的管理 "spf13-vim-3-0-release-and-new-website"
-   :draft       nil ; 是否是草稿，如果是，就不会生成html页面
-   :categories  [] ; 文章分类
-   :tags        [] ; 对应标签
-   :comments    false ; 是否开启文章评论功能
-   :author      ""                                                ;文章作者, 一位，主作者
-   :authors     [] ; 文章作者，多位
+   :updated       nil                                       ; 更新日期，最后一次修改时间
+   :layout        "post"                                    ; 对应布局，目前有两种 post page
+   :slug          nil                                       ;文章标题形成的文件名和网址，设置了，那么 post 文件名的就不管用了，方便中文的管理 "spf13-vim-3-0-release-and-new-website"
+   :draft         nil                                       ; 是否是草稿，如果是，就不会生成html页面
+   :categories    []                                        ; 文章分类
+   :tags          []                                        ; 对应标签
+   :comments      false                                     ; 是否开启文章评论功能
+   :author        ""                                        ;文章作者, 一位，主作者
+   :authors       []                                        ; 文章作者，多位
    ; 还可以增加自定义变量
    })
 
@@ -62,8 +63,8 @@
   如果没有获得的"
   []
   (merge default-settings (try
-    (read-string (slurp "settings.ini"))
-    (catch Exception e nil))))
+                            (read-string (slurp "settings.ini"))
+                            (catch Exception e nil))))
 
 (defn rtrim
   "如果只有一个 s 参数，那么只是清空空格
@@ -99,18 +100,18 @@
   [root]
   (let [root-file (io/file root)]
     (if (.isDirectory root-file)
-    (doseq [path (reverse (file-seq root-file))]
-      (.delete path))
-    (.delete root-file))))
+      (doseq [path (reverse (file-seq root-file))]
+        (.delete path))
+      (.delete root-file))))
 
 (defn wipe-public-folder [public-folder keep-files]
   ; 晴空目录
   (let [public-files (reverse (file-seq (io/file public-folder))) public-folder2 (rtrim public-folder "/") new-keep-files (map #(str public-folder2 "/" %) keep-files)]
     (doall
       (map #(let [f (str %)]
-        (if-not (or (= f public-folder2) (some (fn [k] (= 0 (clojure.string/index-of f k))) new-keep-files) )
-          (do
-            (delete-dir f)) )) public-files))))
+              (if-not (or (= f public-folder2) (some (fn [k] (= 0 (clojure.string/index-of f k))) new-keep-files))
+                (do
+                  (delete-dir f)))) public-files))))
 
 (defn copy-file
   "复制文件"
@@ -158,19 +159,20 @@
 
 (defn time-formater
   [time-str]
-  (clj-time-format/parse multi-parser time-str))
+  (try
+    (clj-time-format/parse multi-parser time-str)
+    (catch Exception e nil)))
 
 (defn get-filename [file]
   (rtrim (clojure.string/replace (.getName file) #"^[\d\-]+-" "") ".md"))
 
 (defn get-post-date
   "获取 post 提交时间"
-  [settings post-config file]
-  (if-let [write-date (:post-date post-config)]
-    (time-formater write-date)
-    (->> (re-find #"^([\d\-]+)-(.*?)\.md$" (.getName file))
-         (second)
-         (time-formater))))
+  [settings post-config file default-time]
+  (let [write-date (:post-date post-config)
+        file-date (second (re-find #"^([\d\-]+)-(.*?)\.md$" (.getName file)))
+        d (time-formater (if write-date write-date file-date))]
+    (if d d default-time)))
 
 
 
@@ -277,13 +279,18 @@
        "/index.html")
   )
 
+(defn get-last-modified
+  [file]
+  (clj-time-coerce/from-long (.lastModified (clojure.java.io/file file)))
+  )
+
 
 (defn parse-post
   "获取post的相关值"
   ([settings file] (parse-post settings file "post"))
   ([settings file ftype]
    (if (is-valid-file settings file)
-     (let [last-modified (.lastModified (clojure.java.io/file file))
+     (let [last-modified (get-last-modified file)
            rdr (clojure.java.io/reader file)
            post-config (try (read (java.io.PushbackReader. rdr))
                             (catch Exception e nil)
@@ -300,7 +307,8 @@
                           )
            post-filename (get-filename file)
            post-title (get-post-title post-config file)
-           post-date (get-post-date settings post-config file)
+           post-date (get-post-date settings post-config file last-modified)
+           _ (println "post-date:" post-date " t:" post-title last-modified ":" (type last-modified))
            post-filepath (if (= ftype "page") (get-public-page-filepath settings post-config file post-date) (get-public-post-filepath settings post-config file post-date))
            post-url (get-post-url settings post-filepath)
            post-authors (get-post-authors settings post-config)
@@ -336,7 +344,7 @@
   其它变量的一个map组成的列表"
   [settings folder-key]
   (->> (file-seq (clojure.java.io/file (folder-key settings)))
-       (pmap #(parse-post settings %))
+       (map #(parse-post settings %))
        (filter not-empty)
        ))
 
@@ -481,16 +489,16 @@
 
     (doall
       ; 生成每一个post
-      (pmap #(generate-post settings % "post.html") post-part-list))
+      (map #(generate-post settings % "post.html") post-part-list))
 
     (if (seq page-part-list)
       (doall
         ; 生成pages
-        (pmap #(generate-page settings % pages "page.html") page-part-list)))
+        (map #(generate-page settings % pages "page.html") page-part-list)))
 
     (doall
       ; 生成所有文章列表页
-      (pmap #(generate-post-list settings % page-numbers "list.html") post-list-list))
+      (map #(generate-post-list settings % page-numbers "list.html") post-list-list))
 
     ; 生成readme
     (generate-readme settings posts "README.MD")
